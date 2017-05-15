@@ -25,11 +25,16 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.util.ISO8601DateFormat;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.marversolutions.bestpublishing.constants.BestPubConstants;
+import org.marversolutions.bestpublishing.model.BestPubContentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -158,19 +163,18 @@ public class BestPubUtilsServiceImpl implements BestPubUtilsService {
 
         @Override
         public Date checkModifiedDates(final NodeRef nodeRef) {
-           /* Date publishedDate = (Date)nodeService.getProperty(nodeRef,
-                    BoppContentModel.WebPublishingInfoAspect.Prop.WEB_PUBLISHED_DATE);
+           Date publishedDate = (Date)nodeService.getProperty(nodeRef,
+                    BestPubContentModel.WebPublishingInfoAspect.Prop.WEB_PUBLISHED_DATE);
             if (publishedDate != null) {
                 return checkModifiedDates(nodeRef, publishedDate);
             } else {
                 return null;
-            }*/
-           return null;
+            }
         }
 
         @Override
         public boolean isISBN(final String isbn) {
-            Matcher isbnMatcher = BoppConstants.ISBN_REGEXP_PATTERN.matcher(isbn);
+            Matcher isbnMatcher = BestPubConstants.ISBN_REGEXP_PATTERN.matcher(isbn);
             if (isbnMatcher.matches() == false) {
                 return false;
             }
@@ -180,153 +184,13 @@ public class BestPubUtilsServiceImpl implements BestPubUtilsService {
 
         @Override
         public String getISBNfromFilename(final String filename) {
-            String isbn = filename.trim().substring(0, BoppConstants.ISBN_NUMBER_LENGTH);
+            String isbn = filename.trim().substring(0, BestPubConstants.ISBN_NUMBER_LENGTH);
             if (!isISBN(isbn)) {
                 LOG.error("Could not extract ISBN number from [{}]", filename);
                 return null;
             }
 
             return isbn;
-        }
-
-        @Override
-        public Map<ChapterFolderInfo, NodeRef> getSortedChapterFolders(NodeRef isbnFolderNodeRef) {
-            Set<QName> childNodeTypes = new HashSet<>();
-            childNodeTypes.add(BoppContentModel.ChapterFolderType.QNAME);
-            List<ChildAssociationRef> chapterFolderChildAssociations =
-                    nodeService.getChildAssocs(isbnFolderNodeRef, childNodeTypes);
-
-            Map<ChapterFolderInfo, NodeRef> existingChapterFolderInfo2NodeRefMap = new TreeMap<>();
-
-            for (ChildAssociationRef chapterFolderChildAssoc : chapterFolderChildAssociations) {
-                NodeRef chapterFolderNodeRef = chapterFolderChildAssoc.getChildRef();
-                String chapterFolderName = (String) nodeService.getProperty(chapterFolderNodeRef, ContentModel.PROP_NAME);
-                String chapterTitle = (String) nodeService.getProperty(
-                        chapterFolderNodeRef, BoppContentModel.ChapterMetadataAspect.Prop.CHAPTER_TITLE);
-                Serializable chapterNr = nodeService.getProperty(
-                        chapterFolderNodeRef, BoppContentModel.ChapterMetadataAspect.Prop.CHAPTER_NUMBER);
-                existingChapterFolderInfo2NodeRefMap.put(
-                        new ChapterFolderInfo(chapterFolderName, chapterTitle, chapterNr), chapterFolderNodeRef);
-            }
-
-            return existingChapterFolderInfo2NodeRefMap;
-        }
-
-        @Override
-        public void applySurveyMetadata(NodeRef fileOrFolderNodeRef, Survey survey) {
-            SurveyFields surveyFields = survey.getBasicSurveyFields();
-
-            // check if isbn is in the RHO list. If it's not we have to prevent the metadata extraction for non RHO isbns
-            String eISBN = surveyFields.getBook().geteISBN();
-            if (!isRhoISBN(eISBN)) {
-                return;
-            }
-
-            if (!nodeService.hasAspect(fileOrFolderNodeRef,  BoppContentModel.BookMetadataAspect.QNAME)) {
-                // Most likely only for CSV
-                Map<QName, Serializable> bookMetadataAspectProps = new HashMap<QName, Serializable>();
-                bookMetadataAspectProps.put(BoppContentModel.BookMetadataAspect.Prop.ISBN, surveyFields.getBook().geteISBN());
-                bookMetadataAspectProps.put(BoppContentModel.BookMetadataAspect.Prop.BOOK_TITLE, surveyFields.getBook().getBookTitle());
-                bookMetadataAspectProps.put(BoppContentModel.BookMetadataAspect.Prop.BOOK_SUBJECT_NAME, ""); // Not available at this point for a CSV
-                bookMetadataAspectProps.put(BoppContentModel.BookMetadataAspect.Prop.BOOK_NUMBER_OF_CHAPTERS, "999");  // not relevant for CSV
-                bookMetadataAspectProps.put(BoppContentModel.BookMetadataAspect.Prop.BOOK_METADATA_STATUS, BoppContentModel.BookMetadataStatus.MISSING.toString());
-                nodeService.addAspect(fileOrFolderNodeRef, BoppContentModel.BookMetadataAspect.QNAME, bookMetadataAspectProps);
-
-            }
-
-            if (!nodeService.hasAspect(fileOrFolderNodeRef, BoppContentModel.ChapterMetadataAspect.QNAME)) {
-                // Most likely only for CSV
-                Map<QName, Serializable> chapterMetadataAspectProps = new HashMap<QName, Serializable>();
-                chapterMetadataAspectProps.put(BoppContentModel.ChapterMetadataAspect.Prop.CHAPTER_NUMBER, "999"); // not relevant for CSV
-                chapterMetadataAspectProps.put(BoppContentModel.ChapterMetadataAspect.Prop.CHAPTER_TITLE, surveyFields.getBook().getChapterTitle());
-                chapterMetadataAspectProps.put(BoppContentModel.ChapterMetadataAspect.Prop.CHAPTER_METADATA_STATUS, BoppContentModel.ChapterMetadataStatus.COMPLETED.toString());
-                nodeService.addAspect(fileOrFolderNodeRef, BoppContentModel.ChapterMetadataAspect.QNAME, chapterMetadataAspectProps);
-            }
-
-            Map<QName, Serializable> existingProperties = nodeService.getProperties(fileOrFolderNodeRef);
-            Map<QName, Serializable> chapterMetadataAspectProps = new HashMap<>();
-            chapterMetadataAspectProps.put(BoppContentModel.ChapterMetadataAspect.Prop.RESPONDENT_ID, surveyFields.getRespondentID());
-            chapterMetadataAspectProps.put(BoppContentModel.ChapterMetadataAspect.Prop.AUTHOR_FIRST_NAME, surveyFields.getAuthor().getProvidedFirstName());
-            chapterMetadataAspectProps.put(BoppContentModel.ChapterMetadataAspect.Prop.AUTHOR_MIDDLE_NAME, surveyFields.getAuthor().getProvidedMiddleNames());
-            chapterMetadataAspectProps.put(BoppContentModel.ChapterMetadataAspect.Prop.AUTHOR_LAST_NAME, surveyFields.getAuthor().getProvidedLastName());
-            chapterMetadataAspectProps.put(BoppContentModel.ChapterMetadataAspect.Prop.ACADEMIC_AUDIENCE, survey.getAudiences().contains("Academic"));
-            chapterMetadataAspectProps.put(BoppContentModel.ChapterMetadataAspect.Prop.PROFESSIONAL_AUDIENCE, survey.getAudiences().contains("Professional"));
-            chapterMetadataAspectProps.put(BoppContentModel.ChapterMetadataAspect.Prop.CHAPTER_METADATA_STATUS, BoppContentModel.ChapterMetadataStatus.COMPLETED.toString());
-            Map<QName, Serializable> allProperties = new HashMap<>();
-            allProperties.putAll(existingProperties);
-            allProperties.putAll(chapterMetadataAspectProps);
-            nodeService.setProperties(fileOrFolderNodeRef, allProperties);
-
-            // Setup the Subject Metadata aspect on the chapter
-            Map<QName, Serializable> metadataProps = new HashMap<>();
-            SurveyFreeTextFields surveyFreeTextFields = survey.getFreeTextSurveyFields();
-            metadataProps.put(BoppContentModel.boppc("notableFigure"), surveyFreeTextFields.getNotablyFigure(0));
-            metadataProps.put(BoppContentModel.boppc("notableFigure2"), surveyFreeTextFields.getNotablyFigure(1));
-            metadataProps.put(BoppContentModel.boppc("notableFigure3"), surveyFreeTextFields.getNotablyFigure(2));
-            metadataProps.put(BoppContentModel.boppc("theorist"), surveyFreeTextFields.getTheoristFigure(0));
-            metadataProps.put(BoppContentModel.boppc("theorist2"), surveyFreeTextFields.getTheoristFigure(1));
-            metadataProps.put(BoppContentModel.boppc("theorist3"), surveyFreeTextFields.getTheoristFigure(2));
-            metadataProps.put(BoppContentModel.boppc("associatedWork"), surveyFreeTextFields.getAssociatedWork(0));
-            metadataProps.put(BoppContentModel.boppc("associatedWork2"), surveyFreeTextFields.getAssociatedWork(1));
-            metadataProps.put(BoppContentModel.boppc("associatedWork3"), surveyFreeTextFields.getAssociatedWork(2));
-            metadataProps.put(BoppContentModel.boppc("caseStudy"), surveyFreeTextFields.getCaseStudy(0));
-            metadataProps.put(BoppContentModel.boppc("caseStudy2"), surveyFreeTextFields.getCaseStudy(1));
-            metadataProps.put(BoppContentModel.boppc("caseStudy3"), surveyFreeTextFields.getCaseStudy(2));
-            metadataProps.put(BoppContentModel.boppc("methodology"), surveyFreeTextFields.getTheory(0));
-            metadataProps.put(BoppContentModel.boppc("methodology2"), surveyFreeTextFields.getTheory(1));
-            metadataProps.put(BoppContentModel.boppc("methodology3"), surveyFreeTextFields.getTheory(2));
-            metadataProps.put(BoppContentModel.boppc("legislation"), surveyFreeTextFields.getTreaty(0));
-            metadataProps.put(BoppContentModel.boppc("legislation2"), surveyFreeTextFields.getTreaty(1));
-            metadataProps.put(BoppContentModel.boppc("legislation3"), surveyFreeTextFields.getTreaty(2));
-            metadataProps.put(BoppContentModel.boppc("entity"), surveyFreeTextFields.getEntity(0));
-            metadataProps.put(BoppContentModel.boppc("entity2"), surveyFreeTextFields.getEntity(1));
-            metadataProps.put(BoppContentModel.boppc("entity3"), surveyFreeTextFields.getEntity(2));
-            metadataProps.put(BoppContentModel.boppc("event"), surveyFreeTextFields.getEvent(0));
-            metadataProps.put(BoppContentModel.boppc("event2"), surveyFreeTextFields.getEvent(1));
-            metadataProps.put(BoppContentModel.boppc("event3"), surveyFreeTextFields.getEvent(2));
-            metadataProps.put(BoppContentModel.boppc("landmark"), surveyFreeTextFields.getLandmark(0));
-            metadataProps.put(BoppContentModel.boppc("landmark2"), surveyFreeTextFields.getLandmark(1));
-            metadataProps.put(BoppContentModel.boppc("landmark3"), surveyFreeTextFields.getLandmark(2));
-            metadataProps.put(BoppContentModel.boppc("era"), surveyFreeTextFields.getEra(0));
-            metadataProps.put(BoppContentModel.boppc("era2"), surveyFreeTextFields.getEra(1));
-            metadataProps.put(BoppContentModel.boppc("era3"), surveyFreeTextFields.getEra(2));
-            metadataProps.put(BoppContentModel.boppc("time1From"), surveyFreeTextFields.getTime(0));
-            metadataProps.put(BoppContentModel.boppc("time1To"), surveyFreeTextFields.getTime(1));
-            metadataProps.put(BoppContentModel.boppc("time2From"), surveyFreeTextFields.getTime(2));
-            metadataProps.put(BoppContentModel.boppc("time2To"), surveyFreeTextFields.getTime(3));
-            metadataProps.put(BoppContentModel.boppc("country"), surveyFreeTextFields.getCountry(0));
-            metadataProps.put(BoppContentModel.boppc("country2"), surveyFreeTextFields.getCountry(1));
-            metadataProps.put(BoppContentModel.boppc("country3"), surveyFreeTextFields.getCountry(2));
-            metadataProps.put(BoppContentModel.boppc("regionDefinitions"), surveyFreeTextFields.getAllRegions());
-            metadataProps.put(BoppContentModel.boppc("regionSelections"), surveyFreeTextFields.getSelectedRegions());
-            metadataProps.put(BoppContentModel.boppc("keywordDefinitions"), survey.getAllKeyTerms());
-            metadataProps.put(BoppContentModel.boppc("keywordSelections"), survey.getSelectedKeyTerms());
-            metadataProps.put(BoppContentModel.boppc("lastKeywordDefinition"), survey.getLastKeytermDefinition());
-            metadataProps.put(BoppContentModel.boppc("lastKeywordSelection"), survey.getLastKeytermSelection());
-            metadataProps.put(BoppContentModel.boppc("disciplineDefinitions"), survey.getAllDisciplines());
-            metadataProps.put(BoppContentModel.boppc("disciplineSelections"), survey.getSelectedDisciplines());
-            metadataProps.put(BoppContentModel.boppc("lastDisciplineDefinition"), survey.getLastDisciplineDefinition());
-            metadataProps.put(BoppContentModel.boppc("lastDisciplineSelection"), survey.getLastDisciplineSelection());
-            metadataProps.put(BoppContentModel.boppc("interdisciplinaryDefinitions"), survey.getAllInterDisciplines());
-            metadataProps.put(BoppContentModel.boppc("interdisciplinarySelections"), survey.getSelectedInterDisciplines());
-            metadataProps.put(BoppContentModel.boppc("lastInterDisciplineDefinition"), survey.getLastKeytermDefinition());
-            metadataProps.put(BoppContentModel.boppc("lastInterDisciplineSelection"), survey.getLastKeytermSelection());
-            metadataProps.put(BoppContentModel.boppc("abstract"), survey.getDescription());
-            nodeService.addAspect(fileOrFolderNodeRef, BoppContentModel.boppc("subjectMetadata"), metadataProps);
-        }
-
-        @Override
-        public boolean isRhoISBN(final String isbn) {
-            boolean isRhoISBN = false;
-
-            NodeRef isbnFilterFileNodeRef = alfrescoRepoUtilsService.getNodeByDisplayPath(BoppConstants.ISBN_FILTER_FILE_PATH);
-            byte[] contentBytes = alfrescoRepoUtilsService.getDocumentContentBytes(isbnFilterFileNodeRef);
-            String contentString = new String(contentBytes, Charset.forName("UTF-8"));
-            if (contentString.contains(isbn)) {
-                isRhoISBN = true;
-            }
-
-            return isRhoISBN;
         }
 
         @Override
@@ -353,7 +217,11 @@ public class BestPubUtilsServiceImpl implements BestPubUtilsService {
          * @return the string after sanitize
          */
         private String removeSpecialCharacters(final String source) {
-            return source.replaceAll("<b>", "").replaceAll("</b>", "").replaceAll("<i>", "").replace("</i>", "").replaceAll(">>", "");
+            return source.replaceAll("<b>", "").
+                    replaceAll("</b>", "").
+                    replaceAll("<i>", "").
+                    replace("</i>", "").
+                    replaceAll(">>", "");
         }
 
 

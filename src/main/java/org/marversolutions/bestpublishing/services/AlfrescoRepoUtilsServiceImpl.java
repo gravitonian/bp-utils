@@ -19,9 +19,10 @@ package org.marversolutions.bestpublishing.services;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.model.Repository;
+import org.alfresco.repo.nodelocator.NodeLocatorService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.model.FileFolderService;
+import org.alfresco.service.cmr.model.*;
 import org.alfresco.service.cmr.repository.*;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
@@ -31,11 +32,13 @@ import org.alfresco.service.namespace.QName;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.tika.Tika;
+import org.marversolutions.bestpublishing.constants.BestPubConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.extensions.webscripts.WebScriptResponse;
 
 import java.io.*;
+import java.io.FileNotFoundException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -72,6 +75,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
      */
     private Repository repository;
     private NodeService nodeService;
+    private NodeLocatorService nodeLocatorService;
     private SearchService searchService;
     private FileFolderService fileFolderService;
     private AuthorityService authorityService;
@@ -86,6 +90,9 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
     }
     public void setNodeService(final NodeService nodeService) {
         this.nodeService = nodeService;
+    }
+    public void setNodeLocatorService(NodeLocatorService nodeLocatorService) {
+        this.nodeLocatorService = nodeLocatorService;
     }
     public void setSearchService(final SearchService searchService) {
         this.searchService = searchService;
@@ -105,23 +112,35 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
 
     @Override
     public NodeRef getCompanyHome() {
-        return repository.getCompanyHome();
+        return nodeLocatorService.getNode("companyhome", null, null);
     }
 
     @Override
     public NodeRef getDataDictionary() {
         return nodeService.getChildByName(getCompanyHome(), ContentModel.ASSOC_CONTAINS,
-                DATA_DICTIONARY_NAME);
+                BestPubConstants.DATA_DICTIONARY_NAME);
     }
 
     @Override
     public NodeRef getNodeByDisplayPath(final String path) {
         String nodePath = path;
+        // Make sure path does not start with /
         if (path.startsWith("/")) {
             nodePath = path.substring(1);
         }
-        nodePath = "workspace/SpacesStore/Company Home/" + nodePath;
-        NodeRef nodeRef = repository.findNodeRef("path", nodePath.split("/"));
+
+        // Get the path elements, such as [ "Data Dictionary", "Email Templates" ]
+        List<String> pathElements = Arrays.asList(StringUtils.split(nodePath, '/'));
+
+        // Use the file folder service to resolve node reference for path elements
+        NodeRef companyHome = getCompanyHome();
+        NodeRef nodeRef = null;
+        try {
+            nodeRef = fileFolderService.resolveNamePath(companyHome, pathElements).getNodeRef();
+        } catch (org.alfresco.service.cmr.model.FileNotFoundException e) {
+            LOG.error("Could not get NodeRef for path: " + path, e);
+        }
+
         return nodeRef;
     }
 
@@ -208,7 +227,8 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
     }
 
     @Override
-    public NodeRef createFile(final NodeRef parentFolderNodeRef, final String filename, final InputStream fileInputStream) {
+    public NodeRef createFile(final NodeRef parentFolderNodeRef, final String filename,
+                              final InputStream fileInputStream) {
         LOG.debug("Creating node and writing content for file [{}]", filename);
 
         // Create file node metadata

@@ -21,6 +21,7 @@ import org.alfresco.service.namespace.QName;
 import org.springframework.extensions.webscripts.WebScriptResponse;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -45,9 +46,10 @@ public interface AlfrescoRepoUtilsService {
     NodeRef getDataDictionary();
 
     /**
-     * Resolves a node reference in the workspace://SpacesStore via its display path.
+     * Resolves a node reference in the 'workspace://SpacesStore' via its display path.
      *
-     * @param path the display path excluding /Company Home and store, such as for example "Royalties/{ISBN}/Sub Rights"
+     * @param path the display path excluding /Company Home and store,
+     *             such as for example "Data Dictionary/Email Templates"
      * @return the node reference for the display path, or null if not found
      */
     public NodeRef getNodeByDisplayPath(final String path);
