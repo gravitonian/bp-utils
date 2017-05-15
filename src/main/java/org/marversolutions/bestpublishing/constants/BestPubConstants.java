@@ -39,12 +39,13 @@ public interface BestPubConstants {
     /**
      * Best Publishing Specific Folder names
      */
-    public static final String BESTPUB_FOLDER_NAME = "BESTPUB";
-    public static final String ADOBE_FOLDER_NAME = "Adobe";
-    public static final String ADOBE_CHAPTERS_FOLDER_NAME = "Adobe Chapters";
+    public static final String BESTPUB_FOLDER_NAME = "BestPub";
+    public static final String CHAPTERS_FOLDER_NAME = "Chapters";
     public static final String ARTWORK_FOLDER_NAME = "Artwork";
     public static final String SUPPLEMENTARY_FOLDER_NAME = "Supplementary";
-    public static final String DATA_DICTIONARY_BESTPUB_FOLDER_PATH = "/" + DATA_DICTIONARY_NAME + "/BESTPUB";
+    public static final String STYLES_FOLDER_NAME = "Styles";
+    public static final String DATA_DICTIONARY_BESTPUB_FOLDER_PATH =
+            "/" + DATA_DICTIONARY_NAME + "/" + BESTPUB_FOLDER_NAME;
     public static final String METADATA_CHECKER_STATUS_FOLDER_NAME = "Metadata Checker";
     public static final String METADATA_CHECKER_STATUS_FOLDER_PATH = DATA_DICTIONARY_BESTPUB_FOLDER_PATH + "/" +
             METADATA_CHECKER_STATUS_FOLDER_NAME;
@@ -53,7 +54,7 @@ public interface BestPubConstants {
     public static final String INCOMING_METADATA_FOLDER_PATH = INCOMING_BASE_FOLDER_PATH + "/Metadata";
     public static final String INCOMING_MANUAL_METADATA_FOLDER_PATH = INCOMING_METADATA_FOLDER_PATH + "/Manual";
     public static final String INCOMING_PUBSTATUS_FOLDER_PATH = INCOMING_BASE_FOLDER_PATH + "/PublishingStatus";
-    public static final String PATH_TO_BESTPUB = "/app:company_home/cm:BESTPUB";
+    public static final String PATH_TO_BESTPUB = "/app:company_home/cm:BestPub";
 
     /**
      * Chapter folder naming, chapter1, chapter2 etc

@@ -23,14 +23,14 @@ package org.marversolutions.bestpublishing.constants;
  * @version 1.0
  */
 public enum ProcessingErrorCode {
-    CONTENT_CHECKER_GENERAL(100, "Content ingestion general error"),
-    CONTENT_CHECKER_EXTRACT_ZIP(101, "Error extracting the zip file"),
-    CONTENT_CHECKER_HANDLE_CHAPTERS(102, "Error extracting and importing chapters"),
-    CONTENT_CHECKER_HANDLE_SUPPLEMENTARY_FILES(103, "Error extracting and importing supplementary files"),
-    CONTENT_CHECKER_HANDLE_ARTWORK_FILES(104, "Error extracting and importing artwork files"),
-    CONTENT_CHECKER_HANDLE_XML_FILE(105, "Error extracting and importing XML file"),
-    CONTENT_CHECKER_HANDLE_ADOBE_BOOK(106, "Error extracting the PDF book from the Adobe folder"),
-    CONTENT_CHECKER_CHAPTER_FILES_MISMATCH(107, "Different number of chapter PDF and XML files"),
+    CONTENT_INGESTION_GENERAL(100, "Content ingestion general error"),
+    CONTENT_INGESTION_EXTRACT_ZIP(101, "Error extracting the zip file"),
+    CONTENT_INGESTION_HANDLE_CHAPTERS(102, "Error extracting and importing chapters"),
+    CONTENT_INGESTION_HANDLE_SUPPLEMENTARY_FILES(103, "Error extracting and importing supplementary files"),
+    CONTENT_INGESTION_HANDLE_ARTWORK_FILES(104, "Error extracting and importing artwork files"),
+    CONTENT_INGESTION_HANDLE_XML_FILE(105, "Error extracting and importing XML file"),
+    CONTENT_INGESTION_HANDLE_ADOBE_BOOK(106, "Error extracting the PDF book from the Adobe folder"),
+    CONTENT_INGESTION_CHAPTER_FILES_MISMATCH(107, "Different number of chapter PDF and XML files"),
 
     METADATA_CHECKER_GENERAL(200, "Metadata checker general error"),
 

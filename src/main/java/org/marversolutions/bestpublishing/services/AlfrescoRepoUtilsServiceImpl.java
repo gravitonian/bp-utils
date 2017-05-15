@@ -18,15 +18,11 @@ package org.marversolutions.bestpublishing.services;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
-import org.alfresco.repo.model.Repository;
-import org.alfresco.repo.nodelocator.NodeLocatorService;
-import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.model.*;
 import org.alfresco.service.cmr.repository.*;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
-import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.io.IOUtils;
@@ -73,51 +69,23 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
     /**
      * Alfresco Services
      */
-    private Repository repository;
-    private NodeService nodeService;
-    private NodeLocatorService nodeLocatorService;
-    private SearchService searchService;
-    private FileFolderService fileFolderService;
-    private AuthorityService authorityService;
-    private ContentService contentService;
-    private DictionaryService dictionaryService;
+    private ServiceRegistry serviceRegistry;
 
     /**
      * Spring Setter Injection
      */
-    public void setRepository(final Repository repository) {
-        this.repository = repository;
-    }
-    public void setNodeService(final NodeService nodeService) {
-        this.nodeService = nodeService;
-    }
-    public void setNodeLocatorService(NodeLocatorService nodeLocatorService) {
-        this.nodeLocatorService = nodeLocatorService;
-    }
-    public void setSearchService(final SearchService searchService) {
-        this.searchService = searchService;
-    }
-    public void setFileFolderService(final FileFolderService fileFolderService) {
-        this.fileFolderService = fileFolderService;
-    }
-    public void setAuthorityService(final AuthorityService authorityService) {
-        this.authorityService = authorityService;
-    }
-    public void setContentService(final ContentService contentService) {
-        this.contentService = contentService;
-    }
-    public void setDictionaryService(final DictionaryService dictionaryService) {
-        this.dictionaryService = dictionaryService;
+    public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+        this.serviceRegistry = serviceRegistry;
     }
 
     @Override
     public NodeRef getCompanyHome() {
-        return nodeLocatorService.getNode("companyhome", null, null);
+        return serviceRegistry.getNodeLocatorService().getNode("companyhome", null, null);
     }
 
     @Override
     public NodeRef getDataDictionary() {
-        return nodeService.getChildByName(getCompanyHome(), ContentModel.ASSOC_CONTAINS,
+        return serviceRegistry.getNodeService().getChildByName(getCompanyHome(), ContentModel.ASSOC_CONTAINS,
                 BestPubConstants.DATA_DICTIONARY_NAME);
     }
 
@@ -136,7 +104,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
         NodeRef companyHome = getCompanyHome();
         NodeRef nodeRef = null;
         try {
-            nodeRef = fileFolderService.resolveNamePath(companyHome, pathElements).getNodeRef();
+            nodeRef = serviceRegistry.getFileFolderService().resolveNamePath(companyHome, pathElements).getNodeRef();
         } catch (org.alfresco.service.cmr.model.FileNotFoundException e) {
             LOG.error("Could not get NodeRef for path: " + path, e);
         }
@@ -146,7 +114,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
 
     @Override
     public NodeRef getChildByName(final NodeRef parent, final String name) {
-        NodeRef nodeRef = nodeService.getChildByName(parent, ContentModel.ASSOC_CONTAINS, name);
+        NodeRef nodeRef = serviceRegistry.getNodeService().getChildByName(parent, ContentModel.ASSOC_CONTAINS, name);
         return nodeRef;
     }
 
@@ -154,7 +122,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
     public NodeRef getOrCreateFolder(final NodeRef parent, final String name) {
         NodeRef folder = getChildByName(parent, name);
         if (folder == null) {
-            folder = fileFolderService.create(parent, name, ContentModel.TYPE_FOLDER).getNodeRef();
+            folder = serviceRegistry.getFileFolderService().create(parent, name, ContentModel.TYPE_FOLDER).getNodeRef();
             LOG.debug("Created sub-folder [{}] for [{}]", name, parent);
         } else {
             LOG.debug("Returning existing sub-folder [{}] for [{}]", name, parent);
@@ -172,7 +140,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
             QName nodeType = type;
             Map<QName, Serializable> nodeProperties = new HashMap<QName, Serializable>();
             nodeProperties.put(ContentModel.PROP_NAME, name);
-            ChildAssociationRef childAssocRef = nodeService.createNode(
+            ChildAssociationRef childAssocRef = serviceRegistry.getNodeService().createNode(
                     parentNodeRef, associationType, associationQName, nodeType, nodeProperties);
 
             return childAssocRef.getChildRef();
@@ -210,7 +178,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
         QName nodeType = ContentModel.TYPE_CONTENT;
         Map<QName, Serializable> nodeProperties = new HashMap<QName, Serializable>();
         nodeProperties.put(ContentModel.PROP_NAME, filename);
-        parentChildAssocRef = nodeService.createNode(
+        parentChildAssocRef = serviceRegistry.getNodeService().createNode(
                 parentFolderNodeRef, associationType, associationQName, nodeType, nodeProperties);
         NodeRef newFileNodeRef = parentChildAssocRef.getChildRef();
         return newFileNodeRef;
@@ -249,8 +217,8 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
 
             // Set content bytes for the new file node
             boolean updateContentPropertyAutomatically = true;
-            ContentWriter writer = contentService.getWriter(newFileNodeRef, ContentModel.PROP_CONTENT,
-                    updateContentPropertyAutomatically);
+            ContentWriter writer = serviceRegistry.getContentService().getWriter(
+                    newFileNodeRef, ContentModel.PROP_CONTENT, updateContentPropertyAutomatically);
             writer.setMimetype(mimeType);
             writer.putContent(fileInputStream); // Closes streams
         } catch (IOException ioe) {
@@ -272,7 +240,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
 
         // Add content to file node
         boolean updateContentPropertyAutomatically = true;
-        ContentWriter writer = contentService.getWriter(newFileNodeRef, ContentModel.PROP_CONTENT,
+        ContentWriter writer = serviceRegistry.getContentService().getWriter(newFileNodeRef, ContentModel.PROP_CONTENT,
                 updateContentPropertyAutomatically);
         writer.setMimetype(mimeType);
         writer.putContent(content);
@@ -300,7 +268,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
         List<NodeRef> matchingNodes = new ArrayList<>();
 
         try {
-            results = searchService.query(workspaceStoreRef, SearchService.LANGUAGE_LUCENE, query);
+            results = serviceRegistry.getSearchService().query(workspaceStoreRef, SearchService.LANGUAGE_LUCENE, query);
         } finally {
             if (results != null) {
                 LOG.debug("Found [{}] nodes that matches query [{}]", results.length(), query);
@@ -319,7 +287,8 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
 
     @Override
     public boolean isPartOfGroup(final String username, final String groupName) {
-        final Set<String> authoritiesForCurrentUser = authorityService.getAuthoritiesForUser(username);
+        final Set<String> authoritiesForCurrentUser =
+                serviceRegistry.getAuthorityService().getAuthoritiesForUser(username);
         if (authoritiesForCurrentUser.contains(groupName)) {
             return true;
         }
@@ -330,7 +299,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
     public NodeRef getNodeByXPath(final String path) {
         StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
 
-        ResultSet rs = searchService.query(storeRef, SearchService.LANGUAGE_XPATH, path);
+        ResultSet rs = serviceRegistry.getSearchService().query(storeRef, SearchService.LANGUAGE_XPATH, path);
         NodeRef nodeRef = null;
         try {
             if (rs.length() == 1) {
@@ -344,7 +313,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
 
     @Override
     public NodeRef getOrCreateXMLFileMetadata(final NodeRef parentNodeRef, final String fileName) {
-        NodeRef xmlFileNodeRef = fileFolderService.searchSimple(parentNodeRef, fileName);
+        NodeRef xmlFileNodeRef = serviceRegistry.getFileFolderService().searchSimple(parentNodeRef, fileName);
         if (xmlFileNodeRef != null) {
             LOG.debug("Found the XML file [{}]", fileName);
             return xmlFileNodeRef;
@@ -354,16 +323,17 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
         properties.put(ContentModel.PROP_NAME, fileName);
 
-        xmlFileNodeRef = nodeService.createNode(
+        xmlFileNodeRef = serviceRegistry.getNodeService().createNode(
                 parentNodeRef,
                 ContentModel.ASSOC_CONTAINS,
                 QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, fileName),
                 ContentModel.TYPE_CONTENT,
                 properties).getChildRef();
 
-        ContentData contentData = (ContentData) nodeService.getProperty(xmlFileNodeRef, ContentModel.PROP_CONTENT);
+        ContentData contentData = (ContentData) serviceRegistry.getNodeService().getProperty(
+                xmlFileNodeRef, ContentModel.PROP_CONTENT);
         ContentData newContentData = ContentData.setMimetype(contentData, MimetypeMap.MIMETYPE_XML);
-        nodeService.setProperty(xmlFileNodeRef, ContentModel.PROP_CONTENT, newContentData);
+        serviceRegistry.getNodeService().setProperty(xmlFileNodeRef, ContentModel.PROP_CONTENT, newContentData);
 
         return xmlFileNodeRef;
     }
@@ -371,11 +341,12 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
     @Override
     public void copyAspects(final NodeRef sourceNodeRef, final NodeRef destNodeRef, final Set<QName> aspects) {
         for (QName aspect : aspects) {
-            if (nodeService.hasAspect(destNodeRef, aspect)) {
-                nodeService.removeAspect(destNodeRef, aspect);
+            if (serviceRegistry.getNodeService().hasAspect(destNodeRef, aspect)) {
+                serviceRegistry.getNodeService().removeAspect(destNodeRef, aspect);
             }
-            Map<QName, Serializable> allNodeProps = nodeService.getProperties(sourceNodeRef);
-            Map<QName, PropertyDefinition> aspectPropDefs = dictionaryService.getAspect(aspect).getProperties(); // including inherited props
+            Map<QName, Serializable> allNodeProps = serviceRegistry.getNodeService().getProperties(sourceNodeRef);
+            Map<QName, PropertyDefinition> aspectPropDefs =
+                    serviceRegistry.getDictionaryService().getAspect(aspect).getProperties(); // including inherited props
             Map<QName, Serializable> nodeProps = new HashMap<QName, Serializable>(aspectPropDefs.size());
             for (QName propQName : aspectPropDefs.keySet()) {
                 Serializable value = allNodeProps.get(propQName);
@@ -383,14 +354,14 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
                     nodeProps.put(propQName, value);
                 }
             }
-            nodeService.addAspect(destNodeRef, aspect, nodeProps);
+            serviceRegistry.getNodeService().addAspect(destNodeRef, aspect, nodeProps);
         }
     }
 
     @Override
     public boolean hasSameContent(final NodeRef file1NodeRef, final NodeRef file2NodeRef) {
-        ContentReader sourceFileContentReader = fileFolderService.getReader(file1NodeRef);
-        ContentReader destinationFileContentReader = fileFolderService.getReader(file2NodeRef);
+        ContentReader sourceFileContentReader = serviceRegistry.getFileFolderService().getReader(file1NodeRef);
+        ContentReader destinationFileContentReader = serviceRegistry.getFileFolderService().getReader(file2NodeRef);
         String sourceFileHash = computeHash(sourceFileContentReader.getContentInputStream(), MD5_HASH_TYPE);
         String destinationFileHash = computeHash(destinationFileContentReader.getContentInputStream(), MD5_HASH_TYPE);
 
@@ -471,7 +442,8 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
 
     public byte[] getDocumentContentBytes(NodeRef documentRef) {
         // Get a content reader
-        ContentReader contentReader = contentService.getReader(documentRef, ContentModel.PROP_CONTENT);
+        ContentReader contentReader =
+                serviceRegistry.getContentService().getReader(documentRef, ContentModel.PROP_CONTENT);
         if (contentReader == null) {
             LOG.error("Content reader was null for [docNodeRef={}]", documentRef);
             return null;

@@ -21,7 +21,6 @@ import org.alfresco.service.namespace.QName;
 import org.springframework.extensions.webscripts.WebScriptResponse;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;

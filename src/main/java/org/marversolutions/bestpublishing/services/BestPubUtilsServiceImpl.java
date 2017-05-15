@@ -17,11 +17,8 @@ limitations under the License.
 package org.marversolutions.bestpublishing.services;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.util.ISO8601DateFormat;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -48,182 +45,170 @@ import java.util.regex.Matcher;
  * @version 1.0
  */
 public class BestPubUtilsServiceImpl implements BestPubUtilsService {
-        private static final Logger LOG = LoggerFactory.getLogger(BestPubUtilsServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BestPubUtilsServiceImpl.class);
 
-        /**
-         * The name of the directory where ZIPs that failed processing are moved
-         */
-        private static final String FAILED_PROCESSING_DIR_NAME = "failedProcessing";
+    /**
+     * The name of the directory where ZIPs that failed processing are moved
+     */
+    private static final String FAILED_PROCESSING_DIR_NAME = "failedProcessing";
 
-        /**
-         * Best Publishing Services
-         */
-        private AlfrescoRepoUtilsService alfrescoRepoUtilsService;
+    /**
+     * Best Publishing Services
+     */
+    private AlfrescoRepoUtilsService alfrescoRepoUtilsService;
 
-        /**
-         * Alfresco Services
-         */
-        private NodeService nodeService;
-        private ContentService contentService;
-        private DictionaryService dictionaryService;
-        private NamespaceService namespaceService;
+    /**
+     * Alfresco Services
+     */
+    private ServiceRegistry serviceRegistry;
 
-        /**
-         * Spring Dependency Injection
-         */
+    /**
+     * Spring Dependency Injection
+     */
 
-        public void setAlfrescoRepoUtilsService(final AlfrescoRepoUtilsService repoUtils) {
-            this.alfrescoRepoUtilsService = repoUtils;
-        }
-        public void setNodeService(final NodeService nodeService) {
-            this.nodeService = nodeService;
-        }
-        public void setContentService(final ContentService contentService) {
-            this.contentService = contentService;
-        }
-        public void setNamespaceService(NamespaceService namespaceService) {
-            this.namespaceService = namespaceService;
-        }
-        public NodeService getNodeService() {
-            return nodeService;
-        }
-        public void setDictionaryService(final DictionaryService dictionaryService) {
-            this.dictionaryService = dictionaryService;
-        }
+    public void setAlfrescoRepoUtilsService(final AlfrescoRepoUtilsService repoUtils) {
+        this.alfrescoRepoUtilsService = repoUtils;
+    }
 
-        /**
-         * Interface Implementation
-         */
+    public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+        this.serviceRegistry = serviceRegistry;
+    }
 
-        @Override
-        public File[] findFilesUsingExtension(final File folderToSearch, final String extension) {
-            return folderToSearch.listFiles(new FileFilter() {
+    /**
+     * Interface Implementation
+     */
 
-                @Override
-                public boolean accept(final File pathname) {
-                    String fileExtension = FilenameUtils.getExtension(pathname.getPath());
-                    return fileExtension.equalsIgnoreCase(extension);
-                }
-            });
-        }
+    @Override
+    public File[] findFilesUsingExtension(final File folderToSearch, final String extension) {
+        return folderToSearch.listFiles(new FileFilter() {
 
-        @Override
-        public String formatDate(final String pattern, final Date date) {
-            if (date == null) {
-                return null;
+            @Override
+            public boolean accept(final File pathname) {
+                String fileExtension = FilenameUtils.getExtension(pathname.getPath());
+                return fileExtension.equalsIgnoreCase(extension);
             }
+        });
+    }
 
-            SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-            return sdf.format(date);
+    @Override
+    public String formatDate(final String pattern, final Date date) {
+        if (date == null) {
+            return null;
         }
 
-        @Override
-        public NodeRef getChapterDestinationFolder(final String fileName, final NodeRef destIsbnFolderNodeRef) {
-            // Filename naming convention: [ISBN]-chapter[chapter number].[pdf|xml]
-            // Such as 9780203807217-chapter8.pdf
-            String chapterFolderName = fileName.substring(fileName.indexOf('-') + 1, fileName.lastIndexOf('.'));
-            if (StringUtils.isBlank(chapterFolderName)) {
-                LOG.error("Could not extract chapter folder name from filename [{}]", fileName);
-                return null;
-            }
+        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+        return sdf.format(date);
+    }
 
-            chapterFolderName = chapterFolderName.toLowerCase();
-            NodeRef chapterFolderNodeRef = alfrescoRepoUtilsService.getChildByName(destIsbnFolderNodeRef, chapterFolderName);
-
-            return chapterFolderNodeRef;
+    @Override
+    public NodeRef getChapterDestinationFolder(final String fileName, final NodeRef destIsbnFolderNodeRef) {
+        // Filename naming convention: [ISBN]-chapter[chapter number].[pdf|xml]
+        // Such as 9780203807217-chapter8.pdf
+        String chapterFolderName = fileName.substring(fileName.indexOf('-') + 1, fileName.lastIndexOf('.'));
+        if (StringUtils.isBlank(chapterFolderName)) {
+            LOG.error("Could not extract chapter folder name from filename [{}]", fileName);
+            return null;
         }
 
-        @Override
-        public Date checkModifiedDates(final NodeRef nodeRef, final Date publishedDate) {
-            if (publishedDate == null) {
-                throw new IllegalArgumentException("Published date cannot be null");
-            }
+        chapterFolderName = chapterFolderName.toLowerCase();
+        NodeRef chapterFolderNodeRef = alfrescoRepoUtilsService.getChildByName(destIsbnFolderNodeRef, chapterFolderName);
 
-            String nodeRefXPath = nodeService.getPath(nodeRef).toPrefixString(namespaceService);
-            String publishedDateString = ISO8601DateFormat.format(publishedDate);
-            String searchQuery = "PATH:\"" + nodeRefXPath + "//*\" AND @cm\\:modified:[" + publishedDateString+ " TO NOW]";
-            Date latestModificationDate = null;
+        return chapterFolderNodeRef;
+    }
 
-            List<NodeRef> modifiedNodeRefs = alfrescoRepoUtilsService.search(searchQuery);
-            for (NodeRef modifiedIsbnChildNode : modifiedNodeRefs) {
-                Date modifiedDate = (Date)nodeService.getProperty(modifiedIsbnChildNode, ContentModel.PROP_MODIFIED);
-                if (modifiedDate.after(publishedDate)) {
-                    if (latestModificationDate == null) {
+    @Override
+    public Date checkModifiedDates(final NodeRef nodeRef, final Date publishedDate) {
+        if (publishedDate == null) {
+            throw new IllegalArgumentException("Published date cannot be null");
+        }
+
+        String nodeRefXPath = serviceRegistry.getNodeService().getPath(nodeRef).
+                toPrefixString(serviceRegistry.getNamespaceService());
+        String publishedDateString = ISO8601DateFormat.format(publishedDate);
+        String searchQuery = "PATH:\"" + nodeRefXPath + "//*\" AND @cm\\:modified:[" + publishedDateString + " TO NOW]";
+        Date latestModificationDate = null;
+
+        List<NodeRef> modifiedNodeRefs = alfrescoRepoUtilsService.search(searchQuery);
+        for (NodeRef modifiedIsbnChildNode : modifiedNodeRefs) {
+            Date modifiedDate = (Date) serviceRegistry.getNodeService().getProperty(
+                    modifiedIsbnChildNode, ContentModel.PROP_MODIFIED);
+            if (modifiedDate.after(publishedDate)) {
+                if (latestModificationDate == null) {
+                    latestModificationDate = modifiedDate;
+                } else {
+                    if (modifiedDate.after(latestModificationDate)) {
                         latestModificationDate = modifiedDate;
-                    } else {
-                        if (modifiedDate.after(latestModificationDate)) {
-                            latestModificationDate = modifiedDate;
-                        }
                     }
                 }
             }
-
-            return latestModificationDate;
         }
 
-        @Override
-        public Date checkModifiedDates(final NodeRef nodeRef) {
-           Date publishedDate = (Date)nodeService.getProperty(nodeRef,
-                    BestPubContentModel.WebPublishingInfoAspect.Prop.WEB_PUBLISHED_DATE);
-            if (publishedDate != null) {
-                return checkModifiedDates(nodeRef, publishedDate);
-            } else {
-                return null;
-            }
-        }
-
-        @Override
-        public boolean isISBN(final String isbn) {
-            Matcher isbnMatcher = BestPubConstants.ISBN_REGEXP_PATTERN.matcher(isbn);
-            if (isbnMatcher.matches() == false) {
-                return false;
-            }
-
-            return true;
-        }
-
-        @Override
-        public String getISBNfromFilename(final String filename) {
-            String isbn = filename.trim().substring(0, BestPubConstants.ISBN_NUMBER_LENGTH);
-            if (!isISBN(isbn)) {
-                LOG.error("Could not extract ISBN number from [{}]", filename);
-                return null;
-            }
-
-            return isbn;
-        }
-
-        @Override
-        public void moveZipToDirForFailedProcessing(File zipFile, String metadataFilesystemPath) throws IOException {
-            File failedMetadataDirectory = new File(metadataFilesystemPath + File.separator + FAILED_PROCESSING_DIR_NAME);
-            if (!failedMetadataDirectory.exists()) {
-                // First time around, create it
-                boolean success = failedMetadataDirectory.mkdir();
-                if (!success) {
-                    throw new IllegalArgumentException("The " + metadataFilesystemPath +
-                            File.separator + FAILED_PROCESSING_DIR_NAME + " directory could not be created");
-                }
-            }
-            java.nio.file.Path zipFilePath = zipFile.toPath();
-            java.nio.file.Path errorDirPath = failedMetadataDirectory.toPath();
-            Files.move(zipFilePath, errorDirPath.resolve(zipFilePath.getFileName()),
-                    StandardCopyOption.REPLACE_EXISTING);
-        }
-
-        /**
-         * Clean values of special characters.
-         *
-         * @param source
-         * @return the string after sanitize
-         */
-        private String removeSpecialCharacters(final String source) {
-            return source.replaceAll("<b>", "").
-                    replaceAll("</b>", "").
-                    replaceAll("<i>", "").
-                    replace("</i>", "").
-                    replaceAll(">>", "");
-        }
-
-
-
+        return latestModificationDate;
     }
+
+    @Override
+    public Date checkModifiedDates(final NodeRef nodeRef) {
+        Date publishedDate = (Date) serviceRegistry.getNodeService().getProperty(nodeRef,
+                BestPubContentModel.WebPublishingInfoAspect.Prop.WEB_PUBLISHED_DATE);
+        if (publishedDate != null) {
+            return checkModifiedDates(nodeRef, publishedDate);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public boolean isISBN(final String isbn) {
+        Matcher isbnMatcher = BestPubConstants.ISBN_REGEXP_PATTERN.matcher(isbn);
+        if (isbnMatcher.matches() == false) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public String getISBNfromFilename(final String filename) {
+        String isbn = filename.trim().substring(0, BestPubConstants.ISBN_NUMBER_LENGTH);
+        if (!isISBN(isbn)) {
+            LOG.error("Could not extract ISBN number from [{}]", filename);
+            return null;
+        }
+
+        return isbn;
+    }
+
+    @Override
+    public void moveZipToDirForFailedProcessing(File zipFile, String metadataFilesystemPath) throws IOException {
+        File failedMetadataDirectory =
+                new File(metadataFilesystemPath + File.separator + FAILED_PROCESSING_DIR_NAME);
+        if (!failedMetadataDirectory.exists()) {
+            // First time around, create it
+            boolean success = failedMetadataDirectory.mkdir();
+            if (!success) {
+                throw new IllegalArgumentException("The " + metadataFilesystemPath +
+                        File.separator + FAILED_PROCESSING_DIR_NAME + " directory could not be created");
+            }
+        }
+        java.nio.file.Path zipFilePath = zipFile.toPath();
+        java.nio.file.Path errorDirPath = failedMetadataDirectory.toPath();
+        Files.move(zipFilePath, errorDirPath.resolve(zipFilePath.getFileName()),
+                StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    /**
+     * Clean values of special characters.
+     *
+     * @param source
+     * @return the string after sanitize
+     */
+    private String removeSpecialCharacters(final String source) {
+        return source.replaceAll("<b>", "").
+                replaceAll("</b>", "").
+                replaceAll("<i>", "").
+                replace("</i>", "").
+                replaceAll(">>", "");
+    }
+
+
+}
