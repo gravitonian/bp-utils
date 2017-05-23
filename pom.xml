@@ -88,6 +88,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- (ADDED) Bring in Spring JMX so we can define ManagedResource with managed properties -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jmx</artifactId>
+            <version>2.0.8</version>
+        </dependency>
+
         <!-- Bring in Spring Context so we can use ApplicationContext, ApplicationContextAware etc -->
         <dependency>
             <groupId>org.springframework</groupId>
