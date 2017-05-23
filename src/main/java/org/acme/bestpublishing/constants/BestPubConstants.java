@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.marversolutions.bestpublishing.constants;
+package org.acme.bestpublishing.constants;
 
 import java.util.regex.Pattern;
 
@@ -54,7 +54,7 @@ public interface BestPubConstants {
     public static final String INCOMING_METADATA_FOLDER_PATH = INCOMING_BASE_FOLDER_PATH + "/Metadata";
     public static final String INCOMING_MANUAL_METADATA_FOLDER_PATH = INCOMING_METADATA_FOLDER_PATH + "/Manual";
     public static final String INCOMING_PUBSTATUS_FOLDER_PATH = INCOMING_BASE_FOLDER_PATH + "/PublishingStatus";
-    public static final String PATH_TO_BESTPUB = "/app:company_home/cm:BestPub";
+    public static final String PATH_TO_BESTPUB = "/app:company_home/cm:" + BESTPUB_FOLDER_NAME;
 
     /**
      * Chapter folder naming, chapter1, chapter2 etc

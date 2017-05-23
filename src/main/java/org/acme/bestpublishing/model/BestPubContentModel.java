@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.marversolutions.bestpublishing.model;
+package org.acme.bestpublishing.model;
 
 import org.alfresco.service.namespace.QName;
 
@@ -27,7 +27,7 @@ import java.util.List;
  * @author martin.bergljung@marversolutions.org
  */
 public class BestPubContentModel {
-    public final static String NAMESPACE_URI = "http://www.marversolutions.org/model/content/publishing/1.0";
+    public final static String NAMESPACE_URI = "http://www.acme.org/model/content/publishing/1.0";
     public final static String NAMESPACE_PREFIX = "bookpub";
 
     /**

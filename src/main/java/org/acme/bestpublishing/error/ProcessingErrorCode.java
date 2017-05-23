@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.marversolutions.bestpublishing.constants;
+package org.acme.bestpublishing.error;
 
 /*
  * Processing Error codes for the different Best Publishing components that support the workflow.

@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.marversolutions.bestpublishing.services;
+package org.acme.bestpublishing.services;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.ServiceRegistry;
@@ -22,8 +22,8 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.util.ISO8601DateFormat;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
-import org.marversolutions.bestpublishing.constants.BestPubConstants;
-import org.marversolutions.bestpublishing.model.BestPubContentModel;
+import org.acme.bestpublishing.constants.BestPubConstants;
+import org.acme.bestpublishing.model.BestPubContentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
