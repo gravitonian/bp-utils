@@ -45,7 +45,7 @@ import java.util.*;
  * Note. these are non-transactional call requiring an existing transaction to be in place.
  * Note2. proper permission checks also need to be in place before making calls.
  *
- * @author martin.bergljung@ixxus.com
+ * @author martin.bergljung@marversoutions.org
  * @version 1.0
  */
 public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
@@ -469,7 +469,8 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
                 try {
                     is.close();
                 } catch (Throwable e) {
-                    LOG.error("Could not close doc content input stream [error={}][docNodeRef={}", e.getMessage(), documentRef);
+                    LOG.error("Could not close doc content input stream [error={}][docNodeRef={}",
+                            e.getMessage(), documentRef);
                 }
             }
         }

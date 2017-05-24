@@ -10,6 +10,13 @@
     <description>Alfresco Platform JAR Module with Repo utils and BestPub utils</description>
     <packaging>jar</packaging>
 
+    <!-- ADDED -->
+    <parent>
+        <groupId>org.acme.bestpublishing</groupId>
+        <artifactId>best-publishing-parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
     <properties>
         <!-- Alfresco Maven Plugin version to use -->
         <alfresco.sdk.version>3.0.0</alfresco.sdk.version>
