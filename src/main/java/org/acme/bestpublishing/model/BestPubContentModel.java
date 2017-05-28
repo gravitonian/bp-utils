@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Best Publishing domain specific content model
+ * Best Publishing domain specific content model Java wrapper class.
  *
  * @author martin.bergljung@marversolutions.org
  */

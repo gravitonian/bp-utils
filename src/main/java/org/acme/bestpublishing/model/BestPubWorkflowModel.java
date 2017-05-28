@@ -19,14 +19,14 @@ package org.acme.bestpublishing.model;
 import org.alfresco.service.namespace.QName;
 
 /**
- * Best Publishing Workflow Model
+ * Best Publishing Workflow Model Java wrapper class.
  *
  * @author martin.bergljung@marversolutions.com
  * @version 1.0
  */
 public class BestPubWorkflowModel {
-    public final static String NAMESPACE_URI = "http://www.tandf.co.uk/model/workflow/content/1.0";
-    public final static String NAMESPACE_PREFIX = "boppw";
+    public final static String NAMESPACE_URI = "http://www.acme.org/model/workflow/content/1.0";
+    public final static String NAMESPACE_PREFIX = "bestpubw";
 
     /**
      * Properties QNames
@@ -40,22 +40,16 @@ public class BestPubWorkflowModel {
 
     // public static final QName TYPE_ISBN_FOLDER = QName.boppc(NAMESPACE_URI, "isbnFolder");
 
-    // Workflow variables that are part of the Bopp Workflow Model XML,
-    // defined separately as they got underscore between namespace and local
-    // name
-    public static final String BOPP_INGEST_AND_PUBLISH_WORKFLOW_NAME = "activiti$taylorAndFrancis-bopp-ingestPublish-process";
-    public static final String BOPP_AUTHOR_MANAGEMENT_WORKFLOW_NAME = "activiti$taylorAndFrancis-bopp-authorsManagement-process";
+    // Workflow variables that are part of the BestPub Workflow Model XML,
+    // defined separately as they got underscore between namespace and local name.
+    public static final String BESTPUB_PUBLISHING_WORKFLOW_NAME = "activiti$taylorAndFrancis-bopp-ingestPublish-process";
     public static final String VAR_PUBLISHING_DATE = NAMESPACE_PREFIX + "_publishingDate";
     public static final String VAR_CHAPTER_LIST = NAMESPACE_PREFIX + "_chapterList";
-    public static final String VAR_MISMATCHED_CHAPTER_LIST = NAMESPACE_PREFIX + "_mismatchedChapterList";
-    public static final String VAR_CONTENT_CHAPTER_MATCHING_ERROR_LIST = NAMESPACE_PREFIX + "_contentChapterMatchingErrorList";
     public static final String VAR_ISBN_FOLDER_NODEREF = NAMESPACE_PREFIX + "_isbnFolderNodeRef";
-    public static final String VAR_NEWLY_MATCHED_CHAPTERS = NAMESPACE_PREFIX + "_newlyMatchedChapterList";
-    public static final String VAR_NEWLY_MATCHED_CONTENT_CHAPTERS = NAMESPACE_PREFIX + "_newlyMatchedContentChapterList";
     public static final String VAR_CHAPTER_COUNT = NAMESPACE_PREFIX + "_nrOfChapters";
     public static final String VAR_CHOSEN_NODEREF = NAMESPACE_PREFIX + "_chosenNodeRef";
 
-    // Process variables not in the Bopp Workflow Model XML (i.e. no namespace required)
+    // Process variables not in the BestPub Workflow Model XML (i.e. no namespace required)
     public static final String VAR_RELATED_ISBN = "relatedISBN";
     public static final String VAR_CONTENT_CHAPTER_MATCHING_OK = "contentChapterMatchingOk";
     public static final String VAR_CONTENT_FOUND = "contentFound";
@@ -67,27 +61,19 @@ public class BestPubWorkflowModel {
     public static final String VAR_INTERRUPT_T11_TIMER_DURATION = "InterruptT11TimerDuration";
     public static final String VAR_WAIT_2_CHECK_METADATA_TIMER_DURATION = "Wait2Check4MetadataTimerDuration";
     public static final String VAR_WAIT_2_CHECK_CONTENT_TIMER_DURATION = "Wait2Check4ContentTimerDuration";
-    public static final String VAR_CSV_NAME = "csvNames";
-    public static final String VAR_CSV_NODEREF = "csvNodeRefs";
-    public static final String VAR_SEND_REMINDER = "sendMetadataMissingReminder";
-    public static final String VAR_REMINDER_SENT = "metadataMissingReminderSent";
     public static final String VAR_METADATA_CHAPTER_MATCHING_OK = "metadataChapterMatchingOk";
     public static final String VAR_METADATA_COMPLETE = "metadataComplete";
     public static final String VAR_CHAPTER_FOLDER_HIERARCHY_EXISTS = "chapterFolderHierarchyExists";
-    public static final String VAR_BOOK_METADATA_TYPE = "bookMetadataType";
-    public static final String BOOK_METADATA_TYPE_FRONTLIST = "frontlist";
-    public static final String BOOK_METADATA_TYPE_BACKLIST = "backlist";
     public static final String VAR_TASK_T5_EXECUTED = "TaskT5Executed";
-    public static final String VAR_ISBN = BestPubContentModel.NAMESPACE_PREFIX + "_eISBN";
+    public static final String VAR_ISBN = BestPubContentModel.NAMESPACE_PREFIX + "_ISBN";
     public static final String VAR_BOOK_TITLE = BestPubContentModel.NAMESPACE_PREFIX + "_bookTitle";
-    public static final String VAR_BOOK_SUBJECT = BestPubContentModel.NAMESPACE_PREFIX + "_bookSubjectName";
+    public static final String VAR_BOOK_GENRE = BestPubContentModel.NAMESPACE_PREFIX + "_bookGenre";
 
     // Properties that matches process variables when starting the workflow,
-    // they don't have a namespace as they are process variables
+    // they don't have a namespace as they are process variables.
     public static final String NO_NAMESPACE = "{}";
     public static final QName PROP_RELATED_ISBN = QName.createQName(NO_NAMESPACE + VAR_RELATED_ISBN);
     public static final QName PROP_CHAPTER_LIST = QName.createQName(NO_NAMESPACE + VAR_CHAPTER_LIST);
-    public static final QName PROP_BOOK_METADATA_TYPE = QName.createQName(NO_NAMESPACE + VAR_BOOK_METADATA_TYPE);
     public static final QName PROP_CONTENT_FOUND = QName.createQName(NO_NAMESPACE + VAR_CONTENT_FOUND);
     public static final QName PROP_CONTENT_ERROR_FOUND = QName.createQName(NO_NAMESPACE + VAR_CONTENT_ERROR_FOUND);
     public static final QName PROP_METADATA_CHAPTER_MATCHING_OK = QName.createQName(NO_NAMESPACE + VAR_METADATA_CHAPTER_MATCHING_OK);
@@ -98,8 +84,6 @@ public class BestPubWorkflowModel {
     public static final QName PROP_WAIT_2_CHECK_METADATA_TIMER_DURATION = QName.createQName(NO_NAMESPACE
                     + VAR_WAIT_2_CHECK_METADATA_TIMER_DURATION);
     public static final QName PROP_WAIT_2_CHECK_CONTENT_TIMER_DURATION = QName.createQName(NO_NAMESPACE + VAR_WAIT_2_CHECK_CONTENT_TIMER_DURATION);
-    public static final QName PROP_CSV_NAME = QName.createQName(NO_NAMESPACE + VAR_CSV_NAME);
-    public static final QName PROP_CSV_NODEREF = QName.createQName(NO_NAMESPACE + VAR_CSV_NODEREF);
 
     public static QName qname(final String qname) {
         return QName.createQName(NAMESPACE_URI, qname);
