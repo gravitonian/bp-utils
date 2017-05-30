@@ -61,20 +61,20 @@ public interface AlfrescoWorkflowUtilsService {
 
     /**
      * Get all active workflow instances for passed in workflow definition name
-     * (e.g. activiti$taylorAndFrancis-bopp-ingestPublish-process), regardless of the workflow definition version/id
-     * (e.g. activiti$taylorAndFrancis-bopp-ingestPublish-process:3:4608) used by the instances.
+     * (e.g. activiti$bestpub-publishing-process), regardless of the workflow definition version/id
+     * (e.g. activiti$bestpub-publishing-process:3:4608) used by the instances.
      *
-     * @param workflowDefinitionName the workflow definition name such as 'activiti$taylorAndFrancis-bopp-ingestPublish-process'
+     * @param workflowDefinitionName the workflow definition name such as 'activiti$bestpub-publishing-process'
      * @return all workflow instances that are active for the workflow definition name
      */
     List<WorkflowInstance> getActiveWorkflows(final String workflowDefinitionName);
 
     /**
      * Get all workflow instances (both active and completed) for passed in workflow definition name
-     * (e.g. activiti$taylorAndFrancis-bopp-ingestPublish-process), regardless of the workflow definition version/id
-     * (e.g. activiti$taylorAndFrancis-bopp-ingestPublish-process:3:4608) used by the instances.
+     * (e.g. activiti$bestpub-publishing-process), regardless of the workflow definition version/id
+     * (e.g. activiti$bestpub-publishing-process:3:4608) used by the instances.
      *
-     * @param workflowDefinitionName the workflow definition name such as 'activiti$taylorAndFrancis-bopp-ingestPublish-process'
+     * @param workflowDefinitionName the workflow definition name such as 'activiti$bestpub-publishing-process'
      * @return all workflow instances that are active or completed for the workflow definition name
      */
     public List<WorkflowInstance> getWorkflows(final String workflowDefinitionName);
@@ -139,22 +139,12 @@ public interface AlfrescoWorkflowUtilsService {
     /**
      * Get workflow instance related to passed in ISBN number.
      *
-     * @param workflowDefinitionName the workflow definition name that the workflow instance has be started from
-     *                               such as 'activiti$taylorAndFrancis-bopp-ingestPublish-process'
+     * @param workflowDefinitionName the workflow definition name that the workflow instance has been started from,
+     *                               such as 'activiti$bestpub-publishing-process'
      * @param isbn          the ISBN-13 number to lookup workflow instance for (e.g. 9780203807217)
      * @return WorkflowInstance object if workflow instance with var relatedISBN = isbn is found
      */
     public WorkflowInstance getWorkflowInstanceForIsbn(final String workflowDefinitionName, final String isbn);
-
-    /**
-     * Get workflow instance related to passed in nodeRefs.
-     *
-     * @param workflowDefinitionName the workflow definition name that the workflow instance has be started from
-     *                               such as 'activiti$taylorAndFrancis-bopp-ingestPublish-process'
-     * @param nodeRefs      the alfresco node references we want to match to a workflow instance
-     * @return WorkflowInstance object if workflow instance with var csvNodeRefs = nodeRefs is found
-     */
-    public WorkflowInstance getWorkflowInstanceForNodeRefs(final String workflowDefinitionName, final String nodeRefs);
 
     /**
      * Get a list of package items (i.e. files and folders associated with bpm_package) for workflow instance

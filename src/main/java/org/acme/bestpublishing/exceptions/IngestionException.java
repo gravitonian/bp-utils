@@ -16,7 +16,7 @@ limitations under the License.
 */
 package org.acme.bestpublishing.exceptions;
 
-import org.acme.bestpublishing.error.ProcessingError;
+import org.acme.bestpublishing.error.ProcessingErrorCode;
 
 /*
  * Represents an error that occurs during the ingestion execution.
@@ -27,19 +27,24 @@ import org.acme.bestpublishing.error.ProcessingError;
 public class IngestionException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
-    private ProcessingError processingError;
+    private ProcessingErrorCode processingErrorCode;
 
     public IngestionException(String message) {
         super(message);
     }
 
-    public IngestionException(ProcessingError processingError) {
-        super(processingError.getErrorMsg());
-        this.processingError = processingError;
+    public IngestionException(ProcessingErrorCode processingErrorCode) {
+        super(processingErrorCode.getDescription());
+        this.processingErrorCode = processingErrorCode;
     }
 
-    public ProcessingError getProcessingError() {
-        return processingError;
+    public IngestionException(ProcessingErrorCode processingErrorCode, String extraMsg) {
+        super(processingErrorCode.getDescription() + "[" + extraMsg + "]");
+        this.processingErrorCode = processingErrorCode;
+    }
+
+    public ProcessingErrorCode getProcessingErrorCode() {
+        return processingErrorCode;
     }
 }
 

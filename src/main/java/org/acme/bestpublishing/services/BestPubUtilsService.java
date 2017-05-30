@@ -16,11 +16,13 @@ limitations under the License.
 */
 package org.acme.bestpublishing.services;
 
+import org.acme.bestpublishing.model.ChapterMetadataInfo;
 import org.alfresco.service.cmr.repository.NodeRef;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 /*
  * Generic Utility Service with methods that does not fit into
@@ -60,6 +62,26 @@ public interface BestPubUtilsService {
     public NodeRef getChapterDestinationFolder(String fileName, NodeRef destIsbnFolderNodeRef);
 
     /**
+     * Extract chapter metadata info from a nodeRef representing a metadata ZIP file.
+     *
+     * @param metadataZipNodeRef the Alfresco Node Ref for the metadata ZIP file
+     * @return A sorted List of chapter metadata information
+     * @throws java.io.IOException if could not extract chapter metadata
+     */
+    List<ChapterMetadataInfo> extractChapterMetadata(NodeRef metadataZipNodeRef) throws IOException;
+
+    /**
+     * Get the book genre name from the text file that contains the Book metadata.
+     * The text file with book metadata has a name as follows: <isbn>.txt.
+     * Such as for example "9780203075180.txt".
+     *
+     * @param metadataZipNodeRef the Alfresco Node Ref for the metadata ZIP file
+     * @return the book genre, such as Mystery
+     * @throws java.io.IOException if could not extract book metadata
+     */
+    public String getBookGenreName(NodeRef metadataZipNodeRef) throws IOException;
+
+    /**
      * Recursively check the ISBN's children for last modified date that are after last published date.
      *
      * @param nodeRef ISBN node reference
@@ -95,11 +117,11 @@ public interface BestPubUtilsService {
 
     /**
      * If a content or metadata ZIP could not be processed correctly move it to a special directory for ZIPs
-     * that failed processing. This is the same for both Content ZIPs, Metadata Backlist ZIPs and Frontlist ZIPs.
+     * that failed processing. This is the same for both Content ZIPs and Metadata ZIPs.
      *
      * @param zipFile the ZIP file that should be moved
      * @param metadataFilesystemPath the filesystem path to the base scanning directory,
-     *                               such as /alf_data/Bopp/Incoming/Metadata
+     *                               such as /alf_data/BestPub/Incoming/Metadata
      * @throws IOException if could not move the file
      */
     public void moveZipToDirForFailedProcessing(File zipFile, String metadataFilesystemPath) throws IOException;

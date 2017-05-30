@@ -16,8 +16,12 @@ limitations under the License.
 */
 package org.acme.bestpublishing.services;
 
+import org.acme.bestpublishing.model.ChapterMetadataInfo;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.repository.ContentData;
+import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.util.ISO8601DateFormat;
 import org.apache.commons.io.FilenameUtils;
@@ -30,9 +34,12 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -114,6 +121,56 @@ public class BestPubUtilsServiceImpl implements BestPubUtilsService {
         NodeRef chapterFolderNodeRef = alfrescoRepoUtilsService.getChildByName(destIsbnFolderNodeRef, chapterFolderName);
 
         return chapterFolderNodeRef;
+    }
+
+    @Override
+    public List<ChapterMetadataInfo> extractChapterMetadata(NodeRef metadataZipNodeRef)
+            throws IOException {
+        List<ChapterMetadataInfo> chapterMetadataInfos = new ArrayList<>();
+        String metadataFilename = (String) serviceRegistry.getNodeService().getProperty(
+                metadataZipNodeRef, ContentModel.PROP_NAME);
+        ContentData metadataContentInfo = (ContentData)serviceRegistry.getNodeService().getProperty(
+                metadataZipNodeRef, ContentModel.PROP_CONTENT);
+        String metadataFileMimeType = metadataContentInfo.getMimetype();
+        ContentReader metadataContentReader = serviceRegistry.getContentService().getReader(
+                metadataZipNodeRef, ContentModel.PROP_CONTENT);
+
+        if (StringUtils.equals(metadataFileMimeType, MimetypeMap.MIMETYPE_ZIP) ||
+                StringUtils.equals(metadataFileMimeType, BestPubConstants.MIMETYPE_ZIP_COMPRESSED)) {
+            LOG.debug("Extracting chapter metadata from ZIP [{}]", metadataFilename);
+            InputStream zipInputStream = metadataContentReader.getContentInputStream();
+
+
+        /*
+            Map<String, List<Survey>> csvFilename2surveysMap =
+                    SurveyMonkeyParser.parseZipFile(metadataFilename, zipInputStream);
+            for (String csvFilename : csvFilename2surveysMap.keySet()) {
+                List<Survey> surveysInCSV = csvFilename2surveysMap.get(csvFilename);
+                String chapterNoText = SurveyMonkeyParser.extractChapterNoTextFromCSVFilename(csvFilename);
+                Integer chapterNumber = SurveyMonkeyParser.extractChapterNumberFromChapterNoText(chapterNoText);
+                if (chapterNumber == -1) {
+                    LOG.warn("Could not extract chapter number from [{}] [csv={}], content matching will not work",
+                            chapterNoText, csvFilename);
+                }
+                ChapterMetadataInfo chapterMetadataInfo =
+                        new ChapterMetadataInfo(chapterNumber, csvFilename, surveysInCSV.get(0));
+                chapterMetadataInfos.add(chapterMetadataInfo);
+            }
+            */
+        } else {
+            LOG.debug("Found file [{}] which is a [{}] instead of a ZIP, so can't process it",
+                    metadataFilename, metadataFileMimeType);
+        }
+
+        // Sorted on chapter numbers
+        Collections.sort(chapterMetadataInfos);
+
+        return chapterMetadataInfos;
+    }
+
+    @Override
+    public String getBookGenreName(NodeRef metadataZipNodeRef) throws IOException {
+        return null;
     }
 
     @Override

@@ -48,7 +48,7 @@ import java.util.*;
  * Note. these are non-transactional call requiring an existing transaction to be in place.
  * Note2. proper permission checks also need to be in place before making calls.
  *
- * @author martin.bergljung@marversolutions.com
+ * @author martin.bergljung@marversolutions.org
  * @version 1.0
  */
 public class AlfrescoWorkflowUtilsServiceImpl implements AlfrescoWorkflowUtilsService, BeanFactoryAware {
@@ -236,20 +236,6 @@ public class AlfrescoWorkflowUtilsServiceImpl implements AlfrescoWorkflowUtilsSe
     }
 
     @Override
-    public WorkflowInstance getWorkflowInstanceForNodeRefs(String workflowDefinitionName, String nodeRefs) {
-        WorkflowInstance workflowInstanceForNodeRefs = null;
-        List<WorkflowInstance> wfInstances = getWorkflows(workflowDefinitionName);
-        for (WorkflowInstance workflowInstance : wfInstances) {
-            String varNodeRefs = getStringProcessVariable(workflowInstance, BestPubWorkflowModel.VAR_CSV_NODEREF);
-            if (StringUtils.equals(nodeRefs, varNodeRefs)) {
-                workflowInstanceForNodeRefs = workflowInstance;
-                break;
-            }
-        }
-        return workflowInstanceForNodeRefs;
-    }
-
-    @Override
     public WorkflowInstance startWorkflowInstance(final String workflowDefId,
                                                   final List<NodeRef> packageFileNodeRefs,
                                                   final Map<QName, Serializable> properties) {
@@ -263,8 +249,8 @@ public class AlfrescoWorkflowUtilsServiceImpl implements AlfrescoWorkflowUtilsSe
         properties.put(WorkflowModel.ASSOC_PACKAGE, workflowPackage);
 
         // Start the workflow
-        // Get latest deployed definition such as "activiti$taylorAndFrancis-bopp-ingestPublish-process:34:9311" from
-        // "activiti$taylorAndFrancis-bopp-ingestPublish-process"
+        // Get latest deployed definition such as "activiti$bestpub-publishing-process:34:9311" from
+        // "activiti$bestpub-publishing-process"
         WorkflowDefinition workflowDefinition = 
                 this.serviceRegistry.getWorkflowService().getDefinitionByName(workflowDefId);
         WorkflowPath workflowPath = 

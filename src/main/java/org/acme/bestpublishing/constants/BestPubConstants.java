@@ -25,41 +25,44 @@ import java.util.regex.Pattern;
  * @version 1.0
  */
 public interface BestPubConstants {
-    public static final int ISBN_NUMBER_LENGTH = 13;
-    public static final Pattern ISBN_REGEXP_PATTERN = Pattern.compile("^(97[8|9]\\d{10})");
+     int ISBN_NUMBER_LENGTH = 13;
+     Pattern ISBN_REGEXP_PATTERN = Pattern.compile("^(97[8|9]\\d{10})");
+
+    /**
+     * Mime types not found in org.alfresco.repo.content.MimetypeMap
+     */
+     String MIMETYPE_ZIP_COMPRESSED = "application/x-zip-compressed";
 
     /**
      * Default Alfresco folder names, usernames, and groups
      */
-    public static final String COMPANY_HOME_NAME = "Company Home";
-    public static final String DATA_DICTIONARY_NAME = "Data Dictionary";
-    public static final String ADMIN_USER_NAME = "admin";
-    public static final String ALFRESCO_ADMINISTRATORS_GROUP_NAME = "GROUP_ALFRESCO_ADMINISTRATORS";
+     String COMPANY_HOME_NAME = "Company Home";
+     String DATA_DICTIONARY_NAME = "Data Dictionary";
+     String ADMIN_USER_NAME = "admin";
+     String ALFRESCO_ADMINISTRATORS_GROUP_NAME = "GROUP_ALFRESCO_ADMINISTRATORS";
 
     /**
      * Best Publishing Specific Folder names
      */
-    public static final String BESTPUB_FOLDER_NAME = "BestPub";
-    public static final String CHAPTERS_FOLDER_NAME = "Chapters";
-    public static final String ARTWORK_FOLDER_NAME = "Artwork";
-    public static final String SUPPLEMENTARY_FOLDER_NAME = "Supplementary";
-    public static final String STYLES_FOLDER_NAME = "Styles";
-    public static final String DATA_DICTIONARY_BESTPUB_FOLDER_PATH =
-            "/" + DATA_DICTIONARY_NAME + "/" + BESTPUB_FOLDER_NAME;
-    public static final String METADATA_CHECKER_STATUS_FOLDER_NAME = "Metadata Checker";
-    public static final String METADATA_CHECKER_STATUS_FOLDER_PATH = DATA_DICTIONARY_BESTPUB_FOLDER_PATH + "/" +
+     String BESTPUB_FOLDER_NAME = "BestPub";
+     String CHAPTERS_FOLDER_NAME = "Chapters";
+     String ARTWORK_FOLDER_NAME = "Artwork";
+     String SUPPLEMENTARY_FOLDER_NAME = "Supplementary";
+     String STYLES_FOLDER_NAME = "Styles";
+     String DATA_DICTIONARY_BESTPUB_FOLDER_PATH = "/" + DATA_DICTIONARY_NAME + "/" + BESTPUB_FOLDER_NAME;
+     String METADATA_CHECKER_STATUS_FOLDER_NAME = "Metadata Checker";
+     String METADATA_CHECKER_STATUS_FOLDER_PATH = DATA_DICTIONARY_BESTPUB_FOLDER_PATH + "/" +
             METADATA_CHECKER_STATUS_FOLDER_NAME;
-    public static final String INCOMING_BASE_FOLDER_PATH = DATA_DICTIONARY_BESTPUB_FOLDER_PATH + "/Incoming";
-    public static final String INCOMING_CONTENT_FOLDER_PATH = INCOMING_BASE_FOLDER_PATH + "/Content";
-    public static final String INCOMING_METADATA_FOLDER_PATH = INCOMING_BASE_FOLDER_PATH + "/Metadata";
-    public static final String INCOMING_MANUAL_METADATA_FOLDER_PATH = INCOMING_METADATA_FOLDER_PATH + "/Manual";
-    public static final String INCOMING_PUBSTATUS_FOLDER_PATH = INCOMING_BASE_FOLDER_PATH + "/PublishingStatus";
-    public static final String PATH_TO_BESTPUB = "/app:company_home/cm:" + BESTPUB_FOLDER_NAME;
+     String INCOMING_BASE_FOLDER_PATH = DATA_DICTIONARY_BESTPUB_FOLDER_PATH + "/Incoming";
+     String INCOMING_CONTENT_FOLDER_PATH = INCOMING_BASE_FOLDER_PATH + "/Content";
+     String INCOMING_METADATA_FOLDER_PATH = INCOMING_BASE_FOLDER_PATH + "/Metadata";
+     String INCOMING_PUBSTATUS_FOLDER_PATH = INCOMING_BASE_FOLDER_PATH + "/PublishingStatus";
+     String PATH_TO_BESTPUB = "/app:company_home/cm:" + BESTPUB_FOLDER_NAME;
 
     /**
      * Chapter folder naming, chapter1, chapter2 etc
      */
-    public static final String CHAPTER_FOLDER_NAME_PREFIX = "chapter";
+     String CHAPTER_FOLDER_NAME_PREFIX = "chapter";
 
 
 }

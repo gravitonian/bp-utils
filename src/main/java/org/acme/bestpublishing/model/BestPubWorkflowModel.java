@@ -21,7 +21,7 @@ import org.alfresco.service.namespace.QName;
 /**
  * Best Publishing Workflow Model Java wrapper class.
  *
- * @author martin.bergljung@marversolutions.com
+ * @author martin.bergljung@marversolutions.org
  * @version 1.0
  */
 public class BestPubWorkflowModel {

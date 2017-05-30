@@ -16,8 +16,8 @@ limitations under the License.
 */
 package org.acme.bestpublishing.actions;
 
+import org.acme.bestpublishing.error.ProcessingErrorCode;
 import org.acme.bestpublishing.exceptions.IngestionException;
-import org.acme.bestpublishing.model.BestPubContentModel;
 import org.acme.bestpublishing.services.AlfrescoRepoUtilsService;
 import org.acme.bestpublishing.services.BestPubUtilsService;
 import org.acme.bestpublishing.services.IngestionService;
@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Date;
 
 //import org.springframework.jmx.export.annotation.ManagedMetric;
@@ -139,7 +138,11 @@ public abstract class AbstractIngestionExecuter {
         return this.zipQueueSize;
     }
 
+    /**
+     * To be implemented by sub classes
+     */
     public abstract Logger getLog();
+    public abstract boolean processZipFile(File zipFile, String extractedISBN, NodeRef alfrescoUploadFolderNodeRef);
 
     /**
      * Executer implementation
@@ -153,17 +156,17 @@ public abstract class AbstractIngestionExecuter {
 
         // Get the node references for the /Company Home/Data Dictionary/BestPub/Incoming/[Content|Metadata]
         // folder where this ingestion action will upload the content
-        NodeRef contentIncomingFolderNodeRef = alfrescoRepoUtilsService.getNodeByXPath(alfrescoFolderPath);
+        NodeRef incomingAlfrescoFolderNodeRef = alfrescoRepoUtilsService.getNodeByXPath(alfrescoFolderPath);
 
         try {
             getLog().debug("File path to check = [{}]", filesystemPathToCheck);
 
             File folder = new File(filesystemPathToCheck);
             if (!folder.exists()) {
-                throw new IngestionException("Folder to check does not exist.");
+                throw new IngestionException(ProcessingErrorCode.INGESTION_DIR_NOT_FOUND);
             }
             if (!folder.isDirectory()) {
-                throw new IngestionException("The file path must be to a directory.");
+                throw new IngestionException(ProcessingErrorCode.INGESTION_DIR_IS_FILE);
             }
 
             File[] zipFiles = bestPubUtilsService.findFilesUsingExtension(folder, "zip");
@@ -171,7 +174,15 @@ public abstract class AbstractIngestionExecuter {
             getLog().debug("Found [{}] " + ingestionType + " files", zipFiles.length);
 
             for (File zipFile : zipFiles) {
-                if (processZipFile(zipFile, contentIncomingFolderNodeRef)) {
+                String isbn = FilenameUtils.removeExtension(zipFile.getName());
+                if (!bestPubUtilsService.isISBN(isbn)) {
+                    getLog().error("Error processing " + ingestionType +
+                            " zip file [{}], filename is not an ISBN number", zipFile.getName());
+
+                    throw new IngestionException(ProcessingErrorCode.INGESTION_NO_ISBN_IN_ZIP_NAME);
+                }
+
+                if (processZipFile(zipFile, isbn, incomingAlfrescoFolderNodeRef)) {
                     // All done, delete the ZIP
                     zipFile.delete();
                 } else {
@@ -188,74 +199,4 @@ public abstract class AbstractIngestionExecuter {
             getLog().error("Encountered an error when ingesting " + ingestionType + " - exiting", e);
         }
     }
-
-    /**
-     * Process one ZIP file and upload its content to Alfresco
-     *
-     * @param zipFile              the ZIP file that should be processed and uploaded
-     * @param alfrescoUploadFolderNodeRef the target folder for new ISBN content or metadata
-     * @return true if processed file ok, false if there was an error
-     */
-    private boolean processZipFile(File zipFile, NodeRef alfrescoUploadFolderNodeRef)
-            throws IOException {
-        getLog().debug("Processing zip file [{}]", zipFile.getName());
-
-        String isbn = FilenameUtils.removeExtension(zipFile.getName());
-        if (!bestPubUtilsService.isISBN(isbn)) {
-            getLog().error("Error processing zip file [{}], filename is not an ISBN number", zipFile.getName());
-
-            return false;
-        }
-
-        // Check if ISBN already exists under /Company Home/Data Dictionary/BestPub/Incoming/[Content|Metadata]
-        NodeRef targetAlfrescoFolderNodeRef = null;
-        NodeRef isbnFolderNodeRef = alfrescoRepoUtilsService.getChildByName(alfrescoUploadFolderNodeRef, isbn);
-        if (isbnFolderNodeRef == null) {
-            // We got a new ISBN that has not been published before
-            // And this means uploading to /Data Dictionary/BestPub/Incoming/[Content|Metadata]
-            targetAlfrescoFolderNodeRef = alfrescoUploadFolderNodeRef;
-
-            getLog().debug("Found new ISBN {} that has not been published before, " +
-                    "uploading to /Data Dictionary/BestPub/Incoming/[Content|Metadata]", isbn);
-        } else {
-            // We got an ISBN that has already been published, so we need to republish it
-
-            // However, first verify that content has been previously completely ingested into the
-            // /Data Dictionary/BestPub/Incoming/[Content|Metadata]/{ISBN} folder and has
-            // property bestpub:ingestionStatus set to Complete.
-            if (serviceRegistry.getNodeService().getProperty(isbnFolderNodeRef,
-                    BestPubContentModel.BookFolderType.Prop.INGESTION_STATUS).
-                    equals(BestPubContentModel.IngestionStatus.COMPLETE.toString())) {
-
-                getLog().debug("Found updated ISBN {} that has been published before, " +
-                        "uploading again to /Data Dictionary/BestPub/Incoming/[Content|Metadata]", isbn);
-
-                // Delete old one if it exists (Content can be re-published multiple times)
-                isbnFolderNodeRef = alfrescoRepoUtilsService.getChildByName(alfrescoUploadFolderNodeRef, isbn);
-                if (isbnFolderNodeRef != null && serviceRegistry.getNodeService().exists(isbnFolderNodeRef)) {
-                    serviceRegistry.getNodeService().deleteNode(isbnFolderNodeRef);
-                }
-            } else {
-                // We got a new ISBN that has had interrupted ingestion, upload again to
-                // /Data Dictionary/BestPub/Incoming/[Content|Metadata]
-                targetAlfrescoFolderNodeRef = alfrescoUploadFolderNodeRef;
-
-                // Delete the interrupted ingestion folder
-                serviceRegistry.getNodeService().deleteNode(isbnFolderNodeRef);
-
-                getLog().debug("Found new ISBN {} that has had interrupted ingestion, " +
-                        "only ISBN folder exist with Ingestion Status = In Progress, " +
-                        "uploading again to /Data Dictionary/BOPP/Incoming/[Content|Metadata]", isbn);
-            }
-        }
-
-        try {
-            ingestionService.importZipFileContent(zipFile, targetAlfrescoFolderNodeRef, isbn);
-            return true;
-        } catch (Exception e) {
-            getLog().error("Error processing zip file " + zipFile.getName(), e);
-        }
-
-        return false;
-    }
-}
+ }

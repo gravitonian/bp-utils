@@ -23,6 +23,10 @@ package org.acme.bestpublishing.error;
  * @version 1.0
  */
 public enum ProcessingErrorCode {
+    INGESTION_DIR_NOT_FOUND(1, "Directory to check does not exist."),
+    INGESTION_DIR_IS_FILE(1, "The file path must be to a directory."),
+    INGESTION_NO_ISBN_IN_ZIP_NAME(3, "No ISBN in ZIP name"),
+
     CONTENT_INGESTION_GENERAL(100, "Content ingestion general error"),
     CONTENT_INGESTION_EXTRACT_ZIP(101, "Error extracting the content zip file"),
     CONTENT_INGESTION_HANDLE_CHAPTERS(102, "Error extracting and importing chapters"),
@@ -35,14 +39,12 @@ public enum ProcessingErrorCode {
     METADATA_INGESTION_GENERAL(200, "Metadata ingestion general error"),
     METADATA_INGESTION_EXTRACT_ZIP(201, "Error extracting the metadata zip file"),
 
-    PUBLISHING_CHECKER_GENERAL(300, "Publishing checker general error"),
-
-    REPUBLISHING_CHECKER_GENERAL(400, "Republishing checker general error");
+    PUBLISHING_CHECKER_GENERAL(300, "Publishing checker general error");
 
     private final int code;
     private final String description;
 
-    private ProcessingErrorCode(int code, String description) {
+    ProcessingErrorCode(int code, String description) {
         this.code = code;
         this.description = description;
     }
