@@ -51,6 +51,7 @@ public class BestPubWorkflowModel {
 
     // Process variables not in the BestPub Workflow Model XML (i.e. no namespace required)
     public static final String VAR_RELATED_ISBN = "relatedISBN";
+    public static final String VAR_ALL_METADATA = "allMetadata";
     public static final String VAR_CONTENT_CHAPTER_MATCHING_OK = "contentChapterMatchingOk";
     public static final String VAR_CONTENT_FOUND = "contentFound";
     public static final String VAR_CONTENT_ERROR_FOUND = "contentErrorFound";
@@ -73,6 +74,7 @@ public class BestPubWorkflowModel {
     // they don't have a namespace as they are process variables.
     public static final String NO_NAMESPACE = "{}";
     public static final QName PROP_RELATED_ISBN = QName.createQName(NO_NAMESPACE + VAR_RELATED_ISBN);
+    public static final QName PROP_ALL_METADATA = QName.createQName(NO_NAMESPACE + VAR_ALL_METADATA);
     public static final QName PROP_CHAPTER_LIST = QName.createQName(NO_NAMESPACE + VAR_CHAPTER_LIST);
     public static final QName PROP_CONTENT_FOUND = QName.createQName(NO_NAMESPACE + VAR_CONTENT_FOUND);
     public static final QName PROP_CONTENT_ERROR_FOUND = QName.createQName(NO_NAMESPACE + VAR_CONTENT_ERROR_FOUND);

@@ -41,7 +41,7 @@ public interface AlfrescoWorkflowUtilsService {
      * @param workflowId the workflow instance identifier
      * @return the username for the person that initiated the workflow
      */
-    String getInitiator(final String workflowId);
+    String getInitiator(String workflowId);
 
     /**
      * Get all assigned and pooled tasks for workflow instances with passed in workflow definition.
@@ -49,7 +49,7 @@ public interface AlfrescoWorkflowUtilsService {
      * @param workflowDefinitionName the activiti workflow definition name
      * @return a list of assigned and pooled tasks for process instances with passed in process definition
      */
-    List<WorkflowTask> getAssignedAndPooledTasksForProcessDefinition(final String workflowDefinitionName);
+    List<WorkflowTask> getAssignedAndPooledTasksForProcessDefinition(String workflowDefinitionName);
 
     /**
      * Get all completed workflow instances for passed in workflow definition
@@ -57,7 +57,7 @@ public interface AlfrescoWorkflowUtilsService {
      * @param workflowDefId the workflow definition that we want to search for completed workflows for
      * @return a list of all completed workflow instances
      */
-    List<WorkflowInstance> getCompletedWorkflows(final String workflowDefId);
+    List<WorkflowInstance> getCompletedWorkflows(String workflowDefId);
 
     /**
      * Get all active workflow instances for passed in workflow definition name
@@ -67,7 +67,7 @@ public interface AlfrescoWorkflowUtilsService {
      * @param workflowDefinitionName the workflow definition name such as 'activiti$bestpub-publishing-process'
      * @return all workflow instances that are active for the workflow definition name
      */
-    List<WorkflowInstance> getActiveWorkflows(final String workflowDefinitionName);
+    List<WorkflowInstance> getActiveWorkflows(String workflowDefinitionName);
 
     /**
      * Get all workflow instances (both active and completed) for passed in workflow definition name
@@ -77,7 +77,7 @@ public interface AlfrescoWorkflowUtilsService {
      * @param workflowDefinitionName the workflow definition name such as 'activiti$bestpub-publishing-process'
      * @return all workflow instances that are active or completed for the workflow definition name
      */
-    public List<WorkflowInstance> getWorkflows(final String workflowDefinitionName);
+    List<WorkflowInstance> getWorkflows(String workflowDefinitionName);
 
     /**
      * Get the value of an Activiti Process Instance variable.
@@ -87,7 +87,7 @@ public interface AlfrescoWorkflowUtilsService {
      * @param varName          a process variable name
      * @return the value of the process variable, need to be casted to the correct type
      */
-    public Object getProcessVariable(final WorkflowInstance workflowInstance, final String varName);
+    Object getProcessVariable(WorkflowInstance workflowInstance, String varName);
 
     /**
      * Get the String value of an Activiti Process Instance variable.
@@ -96,7 +96,7 @@ public interface AlfrescoWorkflowUtilsService {
      * @param variableName     a process variable name
      * @return the String value of an Activiti Process Instance variable, or "" empty string if process variable is not set
      */
-    public String getStringProcessVariable(final WorkflowInstance workflowInstance, final String variableName);
+    String getStringProcessVariable(WorkflowInstance workflowInstance, String variableName);
 
     /**
      * Get the boolean value of an Activiti Process Instance variable.
@@ -105,7 +105,7 @@ public interface AlfrescoWorkflowUtilsService {
      * @param variableName     a process variable name
      * @return the boolean value of an Activiti Process Instance variable
      */
-    public boolean getBooleanProcessVariable(final WorkflowInstance workflowInstance, final String variableName);
+    boolean getBooleanProcessVariable(WorkflowInstance workflowInstance, String variableName);
 
     /**
      * Get the Collection value of an Activiti Process Instance variable
@@ -114,9 +114,9 @@ public interface AlfrescoWorkflowUtilsService {
      * @param variableName
      * @return
      */
-    public Collection<String> getCollectionProcessVariable(final WorkflowInstance workflowInstance, final String variableName);
+    Collection<String> getCollectionProcessVariable(WorkflowInstance workflowInstance, String variableName);
     
-    public Integer getIntProcessVariable(final WorkflowInstance workflowInstance, final String variableName);
+    Integer getIntProcessVariable(WorkflowInstance workflowInstance, String variableName);
     
     /**
      * Set the value of an Activiti Process Instance variable.
@@ -126,7 +126,7 @@ public interface AlfrescoWorkflowUtilsService {
      * @param varName            a process variable name
      * @param value              value to set
      */
-    void setProcessVariable(final String workflowInstanceId, final String varName, final Object value);
+    void setProcessVariable(String workflowInstanceId, String varName, Object value);
 
     /**
      * Returns all workflow tasks that the {@link NodeRef} is part of
@@ -134,7 +134,7 @@ public interface AlfrescoWorkflowUtilsService {
      * @param node a node reference for a content file or folder
      * @return all workflow task associated with that particular Node
      */
-    List<WorkflowInstance> getNodeWorkflows(final NodeRef node);
+    List<WorkflowInstance> getNodeWorkflows(NodeRef node);
 
     /**
      * Get workflow instance related to passed in ISBN number.
@@ -144,7 +144,7 @@ public interface AlfrescoWorkflowUtilsService {
      * @param isbn          the ISBN-13 number to lookup workflow instance for (e.g. 9780203807217)
      * @return WorkflowInstance object if workflow instance with var relatedISBN = isbn is found
      */
-    public WorkflowInstance getWorkflowInstanceForIsbn(final String workflowDefinitionName, final String isbn);
+    WorkflowInstance getWorkflowInstanceForIsbn(String workflowDefinitionName, String isbn);
 
     /**
      * Get a list of package items (i.e. files and folders associated with bpm_package) for workflow instance
@@ -164,6 +164,14 @@ public interface AlfrescoWorkflowUtilsService {
     NodeRef getWorkflowPackageNodeRef(DelegateExecution exec);
 
     /**
+     * Prepare and start a workflow instance, with empty workflow bpm_package
+     * @param workflowDefId the process definition identifier (e.g. activiti$adHoc)
+     * @param properties the properties that the worklflow instance should be started with
+     * @return the workflow instance object for the newly started workflow, or null if it could not be started
+     */
+    WorkflowInstance startWorkflowInstance(String workflowDefId, Map<QName, Serializable> properties);
+
+    /**
      * Prepare and start a workflow instance.
      *
      * @param workflowDefId       the process definition identifier (e.g. activiti$adHoc)
@@ -171,9 +179,9 @@ public interface AlfrescoWorkflowUtilsService {
      * @param properties          the properties that the worklflow instance should be started with
      * @return the workflow instance object for the newly started workflow, or null if it could not be started
      */
-    public WorkflowInstance startWorkflowInstance(final String workflowDefId,
-                                                  final List<NodeRef> packageFileNodeRefs,
-                                                  final Map<QName, Serializable> properties);
+    WorkflowInstance startWorkflowInstance(String workflowDefId,
+                                                  List<NodeRef> packageFileNodeRefs,
+                                                  Map<QName, Serializable> properties);
 
     /**
      * Get the passed in property as a list of Strings.
@@ -185,7 +193,7 @@ public interface AlfrescoWorkflowUtilsService {
      * @param separator the separator to use when splitting a string with values
      * @return
      */
-    public List<String> getWorkflowPropertyAsList(Object propertyValue, final String separator);
+    List<String> getWorkflowPropertyAsList(Object propertyValue, String separator);
 
     /**
      * Get a collection from a property.
@@ -196,5 +204,5 @@ public interface AlfrescoWorkflowUtilsService {
      * @param propertyValue object representing the property value
      * @return
      */
-    public Collection<String> getWorkflowPropertyAsCollection(Object propertyValue);
+    Collection<String> getWorkflowPropertyAsCollection(Object propertyValue);
 }

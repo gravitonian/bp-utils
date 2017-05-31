@@ -38,6 +38,8 @@ public enum ProcessingErrorCode {
 
     METADATA_INGESTION_GENERAL(200, "Metadata ingestion general error"),
     METADATA_INGESTION_EXTRACT_ZIP(201, "Error extracting the metadata zip file"),
+    METADATA_INGESTION_MISSING_BOOK_METADATA(202, "Missing book metadata in zip file"),
+    METADATA_INGESTION_INVALID_GENRE(203, "Book metadata contains invalid book genre"),
 
     PUBLISHING_CHECKER_GENERAL(300, "Publishing checker general error");
 

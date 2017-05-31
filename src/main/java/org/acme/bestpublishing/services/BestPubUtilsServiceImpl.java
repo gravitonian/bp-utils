@@ -16,9 +16,9 @@ limitations under the License.
 */
 package org.acme.bestpublishing.services;
 
-import org.acme.bestpublishing.model.ChapterMetadataInfo;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.dictionary.constraint.ListOfValuesConstraint;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -73,7 +73,7 @@ public class BestPubUtilsServiceImpl implements BestPubUtilsService {
      * Spring Dependency Injection
      */
 
-    public void setAlfrescoRepoUtilsService(final AlfrescoRepoUtilsService repoUtils) {
+    public void setAlfrescoRepoUtilsService(AlfrescoRepoUtilsService repoUtils) {
         this.alfrescoRepoUtilsService = repoUtils;
     }
 
@@ -86,11 +86,11 @@ public class BestPubUtilsServiceImpl implements BestPubUtilsService {
      */
 
     @Override
-    public File[] findFilesUsingExtension(final File folderToSearch, final String extension) {
+    public File[] findFilesUsingExtension(File folderToSearch, final String extension) {
         return folderToSearch.listFiles(new FileFilter() {
 
             @Override
-            public boolean accept(final File pathname) {
+            public boolean accept(File pathname) {
                 String fileExtension = FilenameUtils.getExtension(pathname.getPath());
                 return fileExtension.equalsIgnoreCase(extension);
             }
@@ -98,7 +98,7 @@ public class BestPubUtilsServiceImpl implements BestPubUtilsService {
     }
 
     @Override
-    public String formatDate(final String pattern, final Date date) {
+    public String formatDate(String pattern, Date date) {
         if (date == null) {
             return null;
         }
@@ -108,7 +108,7 @@ public class BestPubUtilsServiceImpl implements BestPubUtilsService {
     }
 
     @Override
-    public NodeRef getChapterDestinationFolder(final String fileName, final NodeRef destIsbnFolderNodeRef) {
+    public NodeRef getChapterDestinationFolder(String fileName, NodeRef destIsbnFolderNodeRef) {
         // Filename naming convention: [ISBN]-chapter[chapter number].[pdf|xml]
         // Such as 9780203807217-chapter8.pdf
         String chapterFolderName = fileName.substring(fileName.indexOf('-') + 1, fileName.lastIndexOf('.'));
@@ -124,57 +124,14 @@ public class BestPubUtilsServiceImpl implements BestPubUtilsService {
     }
 
     @Override
-    public List<ChapterMetadataInfo> extractChapterMetadata(NodeRef metadataZipNodeRef)
-            throws IOException {
-        List<ChapterMetadataInfo> chapterMetadataInfos = new ArrayList<>();
-        String metadataFilename = (String) serviceRegistry.getNodeService().getProperty(
-                metadataZipNodeRef, ContentModel.PROP_NAME);
-        ContentData metadataContentInfo = (ContentData)serviceRegistry.getNodeService().getProperty(
-                metadataZipNodeRef, ContentModel.PROP_CONTENT);
-        String metadataFileMimeType = metadataContentInfo.getMimetype();
-        ContentReader metadataContentReader = serviceRegistry.getContentService().getReader(
-                metadataZipNodeRef, ContentModel.PROP_CONTENT);
-
-        if (StringUtils.equals(metadataFileMimeType, MimetypeMap.MIMETYPE_ZIP) ||
-                StringUtils.equals(metadataFileMimeType, BestPubConstants.MIMETYPE_ZIP_COMPRESSED)) {
-            LOG.debug("Extracting chapter metadata from ZIP [{}]", metadataFilename);
-            InputStream zipInputStream = metadataContentReader.getContentInputStream();
-
-
-        /*
-            Map<String, List<Survey>> csvFilename2surveysMap =
-                    SurveyMonkeyParser.parseZipFile(metadataFilename, zipInputStream);
-            for (String csvFilename : csvFilename2surveysMap.keySet()) {
-                List<Survey> surveysInCSV = csvFilename2surveysMap.get(csvFilename);
-                String chapterNoText = SurveyMonkeyParser.extractChapterNoTextFromCSVFilename(csvFilename);
-                Integer chapterNumber = SurveyMonkeyParser.extractChapterNumberFromChapterNoText(chapterNoText);
-                if (chapterNumber == -1) {
-                    LOG.warn("Could not extract chapter number from [{}] [csv={}], content matching will not work",
-                            chapterNoText, csvFilename);
-                }
-                ChapterMetadataInfo chapterMetadataInfo =
-                        new ChapterMetadataInfo(chapterNumber, csvFilename, surveysInCSV.get(0));
-                chapterMetadataInfos.add(chapterMetadataInfo);
-            }
-            */
-        } else {
-            LOG.debug("Found file [{}] which is a [{}] instead of a ZIP, so can't process it",
-                    metadataFilename, metadataFileMimeType);
-        }
-
-        // Sorted on chapter numbers
-        Collections.sort(chapterMetadataInfos);
-
-        return chapterMetadataInfos;
+    public List<String> getAvailableGenreNames() {
+        return (List<String>)serviceRegistry.getDictionaryService().getConstraint(
+                BestPubContentModel.GENRE_LIST_CONSTRAINT).getConstraint().
+                getParameters().get(ListOfValuesConstraint.ALLOWED_VALUES_PARAM);
     }
 
     @Override
-    public String getBookGenreName(NodeRef metadataZipNodeRef) throws IOException {
-        return null;
-    }
-
-    @Override
-    public Date checkModifiedDates(final NodeRef nodeRef, final Date publishedDate) {
+    public Date checkModifiedDates(NodeRef nodeRef, Date publishedDate) {
         if (publishedDate == null) {
             throw new IllegalArgumentException("Published date cannot be null");
         }
@@ -204,7 +161,7 @@ public class BestPubUtilsServiceImpl implements BestPubUtilsService {
     }
 
     @Override
-    public Date checkModifiedDates(final NodeRef nodeRef) {
+    public Date checkModifiedDates(NodeRef nodeRef) {
         Date publishedDate = (Date) serviceRegistry.getNodeService().getProperty(nodeRef,
                 BestPubContentModel.WebPublishingInfoAspect.Prop.WEB_PUBLISHED_DATE);
         if (publishedDate != null) {
@@ -215,7 +172,7 @@ public class BestPubUtilsServiceImpl implements BestPubUtilsService {
     }
 
     @Override
-    public boolean isISBN(final String isbn) {
+    public boolean isISBN(String isbn) {
         Matcher isbnMatcher = BestPubConstants.ISBN_REGEXP_PATTERN.matcher(isbn);
         if (isbnMatcher.matches() == false) {
             return false;
@@ -225,7 +182,7 @@ public class BestPubUtilsServiceImpl implements BestPubUtilsService {
     }
 
     @Override
-    public String getISBNfromFilename(final String filename) {
+    public String getISBNfromFilename(String filename) {
         String isbn = filename.trim().substring(0, BestPubConstants.ISBN_NUMBER_LENGTH);
         if (!isISBN(isbn)) {
             LOG.error("Could not extract ISBN number from [{}]", filename);
@@ -259,7 +216,7 @@ public class BestPubUtilsServiceImpl implements BestPubUtilsService {
      * @param source
      * @return the string after sanitize
      */
-    private String removeSpecialCharacters(final String source) {
+    private String removeSpecialCharacters(String source) {
         return source.replaceAll("<b>", "").
                 replaceAll("</b>", "").
                 replaceAll("<i>", "").

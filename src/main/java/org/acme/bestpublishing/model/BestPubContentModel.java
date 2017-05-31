@@ -31,6 +31,11 @@ public class BestPubContentModel {
     public final static String NAMESPACE_PREFIX = "bookpub";
 
     /**
+     * A QName for the available Book Genre options, as specified in content model constraint
+     */
+    public static final QName GENRE_LIST_CONSTRAINT = bestpub("bookGenreOptions");
+
+    /**
      * Possible states an ISBN folder can be in when it is populated with incoming content in the Data Dictionary
      */
     public static enum IngestionStatus {

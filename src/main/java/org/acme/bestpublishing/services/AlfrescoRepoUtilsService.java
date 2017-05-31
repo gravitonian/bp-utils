@@ -51,7 +51,7 @@ public interface AlfrescoRepoUtilsService {
      *             such as for example "Data Dictionary/Email Templates"
      * @return the node reference for the display path, or null if not found
      */
-    public NodeRef getNodeByDisplayPath(final String path);
+    NodeRef getNodeByDisplayPath(String path);
 
     /**
      * Get a child node by name for passed in parent node.
@@ -60,7 +60,7 @@ public interface AlfrescoRepoUtilsService {
      * @param name   the name of the child node we are looking for
      * @return the node reference for the child node if found, otherwise null
      */
-    public NodeRef getChildByName(final NodeRef parent, final String name);
+    NodeRef getChildByName(NodeRef parent, String name);
 
     /**
      * Gets, or creates, a folder node based on passed in folder name and parent folder node reference.
@@ -69,7 +69,7 @@ public interface AlfrescoRepoUtilsService {
      * @param name          the folder name we are looking for
      * @return a folder node reference
      */
-    public NodeRef getOrCreateFolder(final NodeRef parentNodeRef, final String name);
+    NodeRef getOrCreateFolder(NodeRef parentNodeRef, String name);
 
     /**
      * Creates a folder node based on passed in folder name, folder type, and parent folder node reference.
@@ -79,7 +79,7 @@ public interface AlfrescoRepoUtilsService {
      * @param type          the QName for the type that the new node should have
      * @return the node reference for the new node
      */
-    public NodeRef createFolder(final NodeRef parentNodeRef, final String name, final QName type);
+    NodeRef createFolder(NodeRef parentNodeRef, String name, QName type);
 
     /**
      * Gets, or creates, a file node in the passed in parent folder with passed in filename and content.
@@ -91,8 +91,8 @@ public interface AlfrescoRepoUtilsService {
      * @return a file node reference for an existing file or for the newly created file,
      * or null if file could not be created
      */
-    public NodeRef getOrCreateFile(final NodeRef parentFolderNodeRef, final String filename,
-                                   final String mimeType, final String content);
+    NodeRef getOrCreateFile(NodeRef parentFolderNodeRef, String filename,
+                                   String mimeType, String content);
 
     /**
      * Creates a file node with passed in filename as a sub-folder to passed in parent folder.
@@ -102,7 +102,7 @@ public interface AlfrescoRepoUtilsService {
      * @param filename            the filename that the new file node should have
      * @return a file node reference for the newly created file, or null if file already exists or could not be created
      */
-    public NodeRef createFileMetadataOnly(final NodeRef parentFolderNodeRef, final String filename);
+    NodeRef createFileMetadataOnly(NodeRef parentFolderNodeRef, String filename);
 
     /**
      * Creates a file node in the passed in parent folder with filename from passed in File object .
@@ -112,8 +112,8 @@ public interface AlfrescoRepoUtilsService {
      * @param file                the object with filename and content bytes
      * @return a file node reference for the newly created file, or null if file already exists or could not be created
      */
-    public NodeRef createFile(final NodeRef parentFolderNodeRef, final File file);
-    public NodeRef createFile(final NodeRef parentFolderNodeRef, final String filename, final InputStream fileInputStream);
+    NodeRef createFile(NodeRef parentFolderNodeRef, File file);
+    NodeRef createFile(NodeRef parentFolderNodeRef, String filename, InputStream fileInputStream);
 
     /**
      * Creates a file node in the passed in parent folder with passed in filename and content.
@@ -124,8 +124,8 @@ public interface AlfrescoRepoUtilsService {
      * @param content             the content string that will make up the physical content of the file
      * @return a file node reference for the newly created file, or null if file already exists or could not be created
      */
-    public NodeRef createFile(final NodeRef parentFolderNodeRef, final String filename,
-                              final String mimeType, final String content);
+    NodeRef createFile(NodeRef parentFolderNodeRef, String filename,
+                              String mimeType, String content);
 
     /**
      * Does a Lucene query with passed in query expression.
@@ -134,7 +134,7 @@ public interface AlfrescoRepoUtilsService {
      * @param query Lucene query matching one node
      * @return the Alfresco node reference for the matching node, or null if no nodes matched
      */
-    public NodeRef searchOne(final String query);
+    NodeRef searchOne(String query);
 
     /**
      * Does a Lucene query with passed in query expression.
@@ -142,7 +142,7 @@ public interface AlfrescoRepoUtilsService {
      * @param query Lucene query matching one node
      * @return the Alfresco node references that matched query, or empty list
      */
-    public List<NodeRef> search(final String query);
+    List<NodeRef> search(String query);
 
     /**
      * Returns true if the user 'username' is a part of the group 'groupName'
@@ -151,7 +151,7 @@ public interface AlfrescoRepoUtilsService {
      * @param groupName the name of the group to search in
      * @return true if the user with 'username' is a part of the group 'groupName'
      */
-    public boolean isPartOfGroup(final String username, final String groupName);
+    boolean isPartOfGroup(String username, String groupName);
 
     /**
      * Create a file with xml mimetype.
@@ -169,7 +169,7 @@ public interface AlfrescoRepoUtilsService {
      * @param path Path to file/folder with namespace prefixes (eg: "cm:")
      * @return NodeRef of the node at the path specified or null if no or multiple nodes are found.
      */
-    public NodeRef getNodeByXPath(final String path);
+    NodeRef getNodeByXPath(String path);
 
     /**
      * Copy and overwrite the set of aspects from source to destination.
@@ -178,7 +178,7 @@ public interface AlfrescoRepoUtilsService {
      * @param destNodeRef
      * @param aspects
      */
-    public void copyAspects(NodeRef sourceNodeRef, NodeRef destNodeRef, Set<QName> aspects);
+    void copyAspects(NodeRef sourceNodeRef, NodeRef destNodeRef, Set<QName> aspects);
 
     /**
      * Compares the bytes of two content files and returns true if they are the same.
@@ -188,7 +188,7 @@ public interface AlfrescoRepoUtilsService {
      * @param file2NodeRef the second file node reference
      * @return returns true if both these files has the same content bytes, false if they have different content
      */
-    public boolean hasSameContent(NodeRef file1NodeRef, NodeRef file2NodeRef);
+    boolean hasSameContent(NodeRef file1NodeRef, NodeRef file2NodeRef);
 
     /**
      * Writes JSON string to response setting correct headers.
@@ -197,7 +197,7 @@ public interface AlfrescoRepoUtilsService {
      * @param json     String representation of the JSON Object that will be written in WebScript response
      * @throws IOException
      */
-    public void writeJsonResponse(final WebScriptResponse response, String json) throws IOException;
+    void writeJsonResponse(WebScriptResponse response, String json) throws IOException;
 
     /**
      * Get the content bytes for the document with passed in node reference.
@@ -205,5 +205,5 @@ public interface AlfrescoRepoUtilsService {
      * @param documentRef the node reference for the document we want the content bytes for
      * @return a byte array containing the document content or null if not found
      */
-    public byte[] getDocumentContentBytes(NodeRef documentRef);
+    byte[] getDocumentContentBytes(NodeRef documentRef);
 }

@@ -36,5 +36,5 @@ public interface IngestionService {
      * @param alfrescoFolderNodeRef the node ref for /Company Home/Data Dictionary/BestPub/Incoming/[Content|Metadata]
      * @param isbn the book ISBN 13 number
      */
-    public void importZipFileContent(final File zipFile, final NodeRef alfrescoFolderNodeRef, final String isbn);
+    public void importZipFileContent(File zipFile, NodeRef alfrescoFolderNodeRef, String isbn);
 }

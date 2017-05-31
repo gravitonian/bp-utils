@@ -90,7 +90,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
     }
 
     @Override
-    public NodeRef getNodeByDisplayPath(final String path) {
+    public NodeRef getNodeByDisplayPath(String path) {
         String nodePath = path;
         // Make sure path does not start with /
         if (path.startsWith("/")) {
@@ -113,13 +113,13 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
     }
 
     @Override
-    public NodeRef getChildByName(final NodeRef parent, final String name) {
+    public NodeRef getChildByName(NodeRef parent, String name) {
         NodeRef nodeRef = serviceRegistry.getNodeService().getChildByName(parent, ContentModel.ASSOC_CONTAINS, name);
         return nodeRef;
     }
 
     @Override
-    public NodeRef getOrCreateFolder(final NodeRef parent, final String name) {
+    public NodeRef getOrCreateFolder(NodeRef parent, String name) {
         NodeRef folder = getChildByName(parent, name);
         if (folder == null) {
             folder = serviceRegistry.getFileFolderService().create(parent, name, ContentModel.TYPE_FOLDER).getNodeRef();
@@ -131,7 +131,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
     }
 
     @Override
-    public NodeRef createFolder(final NodeRef parentNodeRef, final String name, final QName type) {
+    public NodeRef createFolder(NodeRef parentNodeRef, String name, QName type) {
         NodeRef folderNodeRef = getChildByName(parentNodeRef, name);
         if (folderNodeRef == null) {
             QName associationType = ContentModel.ASSOC_CONTAINS;
@@ -150,8 +150,8 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
     }
 
     @Override
-    public NodeRef getOrCreateFile(final NodeRef parentFolderNodeRef, final String filename,
-                                   final String mimeType, final String content) {
+    public NodeRef getOrCreateFile(NodeRef parentFolderNodeRef, String filename,
+                                   String mimeType, String content) {
         NodeRef file = getChildByName(parentFolderNodeRef, filename);
         if (file == null) {
             file = createFile(parentFolderNodeRef, filename, mimeType, content);
@@ -164,7 +164,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
     }
 
     @Override
-    public NodeRef createFileMetadataOnly(final NodeRef parentFolderNodeRef, final String filename) {
+    public NodeRef createFileMetadataOnly(NodeRef parentFolderNodeRef, String filename) {
         NodeRef fileNodeRef = getChildByName(parentFolderNodeRef, filename);
         if (fileNodeRef != null) {
             LOG.error("File [{}] already exists, cannot create", fileNodeRef);
@@ -185,7 +185,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
     }
 
     @Override
-    public NodeRef createFile(final NodeRef parentFolderNodeRef, final File file) {
+    public NodeRef createFile(NodeRef parentFolderNodeRef, File file) {
         try {
             return createFile(parentFolderNodeRef, file.getName(), new BufferedInputStream(new FileInputStream(file)));
         } catch (FileNotFoundException e) {
@@ -195,8 +195,8 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
     }
 
     @Override
-    public NodeRef createFile(final NodeRef parentFolderNodeRef, final String filename,
-                              final InputStream fileInputStream) {
+    public NodeRef createFile(NodeRef parentFolderNodeRef, String filename,
+                              InputStream fileInputStream) {
         LOG.debug("Creating node and writing content for file [{}]", filename);
 
         // Create file node metadata
@@ -229,8 +229,8 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
     }
 
     @Override
-    public NodeRef createFile(final NodeRef parentFolderNodeRef, final String filename,
-                              final String mimeType, final String content) {
+    public NodeRef createFile(NodeRef parentFolderNodeRef, String filename,
+                              String mimeType, String content) {
         // Create file node metadata
         NodeRef newFileNodeRef = createFileMetadataOnly(parentFolderNodeRef, filename);
         if (newFileNodeRef == null) {
@@ -249,7 +249,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
     }
 
     @Override
-    public NodeRef searchOne(final String query) {
+    public NodeRef searchOne(String query) {
         List<NodeRef> matchingNodes = search(query);
 
         if (matchingNodes.isEmpty()) {
@@ -260,7 +260,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
     }
 
     @Override
-    public List<NodeRef> search(final String query) {
+    public List<NodeRef> search(String query) {
         LOG.debug("Executing Lucene query [{}]", query);
 
         StoreRef workspaceStoreRef = StoreRef.STORE_REF_WORKSPACE_SPACESSTORE;
@@ -286,8 +286,8 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
 
 
     @Override
-    public boolean isPartOfGroup(final String username, final String groupName) {
-        final Set<String> authoritiesForCurrentUser =
+    public boolean isPartOfGroup(String username, String groupName) {
+        Set<String> authoritiesForCurrentUser =
                 serviceRegistry.getAuthorityService().getAuthoritiesForUser(username);
         if (authoritiesForCurrentUser.contains(groupName)) {
             return true;
@@ -296,7 +296,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
     }
 
     @Override
-    public NodeRef getNodeByXPath(final String path) {
+    public NodeRef getNodeByXPath(String path) {
         StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
 
         ResultSet rs = serviceRegistry.getSearchService().query(storeRef, SearchService.LANGUAGE_XPATH, path);
@@ -312,7 +312,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
     }
 
     @Override
-    public NodeRef getOrCreateXMLFileMetadata(final NodeRef parentNodeRef, final String fileName) {
+    public NodeRef getOrCreateXMLFileMetadata(NodeRef parentNodeRef, String fileName) {
         NodeRef xmlFileNodeRef = serviceRegistry.getFileFolderService().searchSimple(parentNodeRef, fileName);
         if (xmlFileNodeRef != null) {
             LOG.debug("Found the XML file [{}]", fileName);
@@ -339,7 +339,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
     }
 
     @Override
-    public void copyAspects(final NodeRef sourceNodeRef, final NodeRef destNodeRef, final Set<QName> aspects) {
+    public void copyAspects(NodeRef sourceNodeRef, NodeRef destNodeRef, Set<QName> aspects) {
         for (QName aspect : aspects) {
             if (serviceRegistry.getNodeService().hasAspect(destNodeRef, aspect)) {
                 serviceRegistry.getNodeService().removeAspect(destNodeRef, aspect);
@@ -359,7 +359,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
     }
 
     @Override
-    public boolean hasSameContent(final NodeRef file1NodeRef, final NodeRef file2NodeRef) {
+    public boolean hasSameContent(NodeRef file1NodeRef, NodeRef file2NodeRef) {
         ContentReader sourceFileContentReader = serviceRegistry.getFileFolderService().getReader(file1NodeRef);
         ContentReader destinationFileContentReader = serviceRegistry.getFileFolderService().getReader(file2NodeRef);
         String sourceFileHash = computeHash(sourceFileContentReader.getContentInputStream(), MD5_HASH_TYPE);
@@ -369,7 +369,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
     }
 
     @Override
-    public void writeJsonResponse(final WebScriptResponse response, final String json) throws IOException {
+    public void writeJsonResponse(WebScriptResponse response, String json) throws IOException {
         String jsonResponse = null;
         if (json != null) {
             jsonResponse = json;
@@ -378,7 +378,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
         }
         response.setContentType(MimetypeMap.MIMETYPE_JSON);
         response.setContentEncoding("UTF-8");
-        final int length = jsonResponse.getBytes("UTF-8").length;
+        int length = jsonResponse.getBytes("UTF-8").length;
         response.addHeader("Content-Length", "" + length);
         response.getWriter().write(jsonResponse);
     }
@@ -390,7 +390,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
      * @param hashType      the hash algorithm (e.g. md5, sha-1, sha-256, sha-384, sha-512)
      * @return hash code
      */
-    private String computeHash(final InputStream contentStream, final String hashType) {
+    private String computeHash(InputStream contentStream, String hashType) {
         MessageDigest messageDigest = null;
 
         try {
@@ -426,7 +426,7 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
      * @param array array of bytes
      * @return hash code
      */
-    private String convertByteArrayToHex(final byte[] array) {
+    private String convertByteArrayToHex(byte[] array) {
         StringBuffer hashValue = new StringBuffer();
 
         for (byte element : array) {

@@ -90,46 +90,46 @@ public class AlfrescoWorkflowUtilsServiceImpl implements AlfrescoWorkflowUtilsSe
      *
      * @param activitiRuntimeService
      */
-    public void setActivitiRuntimeService(final RuntimeService activitiRuntimeService) {
+    public void setActivitiRuntimeService(RuntimeService activitiRuntimeService) {
         this.activitiRuntimeService = activitiRuntimeService;
     }
 
     @Override
-    public String getInitiator(final String workflowId) {
-        final NodeRef initiatorPersonNodeRef = 
+    public String getInitiator(String workflowId) {
+        NodeRef initiatorPersonNodeRef =
                 serviceRegistry.getWorkflowService().getWorkflowById(workflowId).getInitiator();
         return (String) serviceRegistry.getNodeService().getProperty(initiatorPersonNodeRef, ContentModel.PROP_USERNAME);
     }
 
     @Override
-    public List<WorkflowTask> getAssignedAndPooledTasksForProcessDefinition(final String workflowDefinitionName) {
+    public List<WorkflowTask> getAssignedAndPooledTasksForProcessDefinition(String workflowDefinitionName) {
         // Setup query for active tasks in progress
-        final WorkflowTaskQuery query = new WorkflowTaskQuery();
+        WorkflowTaskQuery query = new WorkflowTaskQuery();
         query.setTaskState(WorkflowTaskState.IN_PROGRESS);
         query.setWorkflowDefinitionName(workflowDefinitionName);
         query.setOrderBy(new WorkflowTaskQuery.OrderBy[]{
                 WorkflowTaskQuery.OrderBy.TaskCreated_Desc, WorkflowTaskQuery.OrderBy.TaskActor_Asc});
 
         // Do the query
-        final boolean sameSession = true;
-        final List<WorkflowTask> queryTasks = new ArrayList<WorkflowTask>();
+        boolean sameSession = true;
+        List<WorkflowTask> queryTasks = new ArrayList<WorkflowTask>();
         queryTasks.addAll(serviceRegistry.getWorkflowService().queryTasks(query, sameSession));
 
         return queryTasks;
     }
 
     @Override
-    public List<WorkflowInstance> getNodeWorkflows(final NodeRef node) {
+    public List<WorkflowInstance> getNodeWorkflows(NodeRef node) {
         return serviceRegistry.getWorkflowService().getWorkflowsForContent(node, true);
     }
 
     @Override
-    public List<WorkflowInstance> getCompletedWorkflows(final String workflowDefId) {
+    public List<WorkflowInstance> getCompletedWorkflows(String workflowDefId) {
         return serviceRegistry.getWorkflowService().getCompletedWorkflows();
     }
 
     @Override
-    public List<WorkflowInstance> getActiveWorkflows(final String workflowDefinitionName) {
+    public List<WorkflowInstance> getActiveWorkflows(String workflowDefinitionName) {
         List<WorkflowInstance> activeWorkflows = new ArrayList<>();
         List<WorkflowInstance> allActiveWorkflows = serviceRegistry.getWorkflowService().getActiveWorkflows();
         for (WorkflowInstance activeWorkflowInstance : allActiveWorkflows) {
@@ -142,7 +142,7 @@ public class AlfrescoWorkflowUtilsServiceImpl implements AlfrescoWorkflowUtilsSe
     }
 
     @Override
-    public List<WorkflowInstance> getWorkflows(final String workflowDefinitionName) {
+    public List<WorkflowInstance> getWorkflows(String workflowDefinitionName) {
         List<WorkflowInstance> workflows = new ArrayList<>();
         List<WorkflowInstance> allWorkflows = serviceRegistry.getWorkflowService().getWorkflows();
         for (WorkflowInstance workflowInstance : allWorkflows) {
@@ -155,9 +155,9 @@ public class AlfrescoWorkflowUtilsServiceImpl implements AlfrescoWorkflowUtilsSe
     }
 
     @Override
-    public Object getProcessVariable(final WorkflowInstance workflowInstance, final String variableName) {
+    public Object getProcessVariable(WorkflowInstance workflowInstance, String variableName) {
         if (workflowInstance.isActive()) {
-            final String executionId = BPMEngineRegistry.getLocalId(workflowInstance.getId());
+            String executionId = BPMEngineRegistry.getLocalId(workflowInstance.getId());
             return getActivitiRuntimeService().getVariable(executionId, variableName);
         } else {
             HistoricVariableInstanceQuery hviq = getActivitiHistoryService().createHistoricVariableInstanceQuery().
@@ -175,7 +175,7 @@ public class AlfrescoWorkflowUtilsServiceImpl implements AlfrescoWorkflowUtilsSe
     }
 
     @Override
-    public String getStringProcessVariable(final WorkflowInstance workflowInstance, final String variableName) {
+    public String getStringProcessVariable(WorkflowInstance workflowInstance, String variableName) {
         Object variableObject = getProcessVariable(workflowInstance, variableName);
         String varString = "";
         if (variableObject != null) {
@@ -185,7 +185,7 @@ public class AlfrescoWorkflowUtilsServiceImpl implements AlfrescoWorkflowUtilsSe
     }
 
     @Override
-    public boolean getBooleanProcessVariable(final WorkflowInstance workflowInstance, final String variableName) {
+    public boolean getBooleanProcessVariable(WorkflowInstance workflowInstance, String variableName) {
         Object variableObject = getProcessVariable(workflowInstance, variableName);
         boolean variableBoolean = false;
         if (variableObject != null) {
@@ -195,8 +195,8 @@ public class AlfrescoWorkflowUtilsServiceImpl implements AlfrescoWorkflowUtilsSe
     }
 
     @Override
-    public Collection<String> getCollectionProcessVariable(final WorkflowInstance workflowInstance, 
-                                                           final String variableName) {
+    public Collection<String> getCollectionProcessVariable(WorkflowInstance workflowInstance,
+                                                           String variableName) {
         Object variableObject = getProcessVariable(workflowInstance, variableName);
         Collection<String> collection = null;
         if (variableObject != null && variableObject instanceof Collection<?>) {
@@ -206,7 +206,7 @@ public class AlfrescoWorkflowUtilsServiceImpl implements AlfrescoWorkflowUtilsSe
     }
 
     @Override
-    public Integer getIntProcessVariable(final WorkflowInstance workflowInstance, final String variableName) {
+    public Integer getIntProcessVariable(WorkflowInstance workflowInstance, String variableName) {
         Object variableObject = getProcessVariable(workflowInstance, variableName);
         Integer intg = null;
         if (variableObject != null && variableObject instanceof Collection<?>) {
@@ -216,13 +216,13 @@ public class AlfrescoWorkflowUtilsServiceImpl implements AlfrescoWorkflowUtilsSe
     }
 
     @Override
-    public void setProcessVariable(final String workflowInstanceId, final String varName, final Object value) {
-        final String executionId = BPMEngineRegistry.getLocalId(workflowInstanceId);
+    public void setProcessVariable(String workflowInstanceId, String varName, Object value) {
+        String executionId = BPMEngineRegistry.getLocalId(workflowInstanceId);
         getActivitiRuntimeService().setVariable(executionId, varName, value);
     }
 
     @Override
-    public WorkflowInstance getWorkflowInstanceForIsbn(final String workflowDefinitionName, final String isbn) {
+    public WorkflowInstance getWorkflowInstanceForIsbn(String workflowDefinitionName, String isbn) {
         WorkflowInstance workflowInstanceForIsbn = null;
         List<WorkflowInstance> wfInstances = getWorkflows(workflowDefinitionName);
         for (WorkflowInstance workflowInstance : wfInstances) {
@@ -236,9 +236,15 @@ public class AlfrescoWorkflowUtilsServiceImpl implements AlfrescoWorkflowUtilsSe
     }
 
     @Override
-    public WorkflowInstance startWorkflowInstance(final String workflowDefId,
-                                                  final List<NodeRef> packageFileNodeRefs,
-                                                  final Map<QName, Serializable> properties) {
+    public WorkflowInstance startWorkflowInstance(String workflowDefId, Map<QName, Serializable> properties) {
+        List<NodeRef> packageFileNodeRefs = new ArrayList<>();
+        return startWorkflowInstance(workflowDefId, packageFileNodeRefs, properties);
+    }
+
+    @Override
+    public WorkflowInstance startWorkflowInstance(String workflowDefId,
+                                                  List<NodeRef> packageFileNodeRefs,
+                                                  Map<QName, Serializable> properties) {
         // Setup workflow package with files (i.e. setup bpm_package)
         NodeRef workflowPackage = serviceRegistry.getWorkflowService().createPackage(null);
         for (NodeRef packageFileNodeRef : packageFileNodeRefs) {
@@ -319,7 +325,7 @@ public class AlfrescoWorkflowUtilsServiceImpl implements AlfrescoWorkflowUtilsSe
     }
 
     @Override
-    public List<String> getWorkflowPropertyAsList(Object propertyValue, final String separator) {
+    public List<String> getWorkflowPropertyAsList(Object propertyValue, String separator) {
         if (propertyValue instanceof String) {
             return Arrays.asList(((String) propertyValue).split(separator));
         } else if (propertyValue instanceof List) {

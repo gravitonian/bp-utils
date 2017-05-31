@@ -25,6 +25,11 @@
         <property name="serviceRegistry" ref="ServiceRegistry"/>
     </bean>
 
+    <bean id="org.acme.bestpublishing.services.alfrescoWorkflowUtilsService"
+          class="org.acme.bestpublishing.services.AlfrescoWorkflowUtilsServiceImpl">
+        <property name="serviceRegistry" ref="ServiceRegistry"/>
+    </bean>
+
     <bean id="org.acme.bestpublishing.services.bestPubUtilsService"
           class="org.acme.bestpublishing.services.BestPubUtilsServiceImpl">
         <property name="alfrescoRepoUtilsService"

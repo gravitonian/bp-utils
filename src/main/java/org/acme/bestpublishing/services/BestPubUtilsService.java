@@ -16,7 +16,6 @@ limitations under the License.
 */
 package org.acme.bestpublishing.services;
 
-import org.acme.bestpublishing.model.ChapterMetadataInfo;
 import org.alfresco.service.cmr.repository.NodeRef;
 
 import java.io.File;
@@ -39,7 +38,7 @@ public interface BestPubUtilsService {
      * @param extension      the file extension we are looking for (e.g. "zip")
      * @return an array of files with matching file extension
      */
-    public File[] findFilesUsingExtension(final File folderToSearch, final String extension);
+    File[] findFilesUsingExtension(File folderToSearch, String extension);
 
     /**
      * Format date by passed in pattern
@@ -48,7 +47,7 @@ public interface BestPubUtilsService {
      * @param date    the date object to format
      * @return date in string format or empty string if date object was null
      */
-    public String formatDate(final String pattern, final Date date);
+    String formatDate(String pattern, Date date);
 
     /**
      * Returns the {@link org.alfresco.service.cmr.repository.NodeRef} for a chapter folder in
@@ -59,27 +58,14 @@ public interface BestPubUtilsService {
      * @param destIsbnFolderNodeRef the node reference for the ISBN folder under /Company Home/RHO (the destination)
      * @return {@link NodeRef} of the destination chapter folder node reference, or null if it could not be found
      */
-    public NodeRef getChapterDestinationFolder(String fileName, NodeRef destIsbnFolderNodeRef);
+    NodeRef getChapterDestinationFolder(String fileName, NodeRef destIsbnFolderNodeRef);
 
     /**
-     * Extract chapter metadata info from a nodeRef representing a metadata ZIP file.
+     * Get the available book genre names, as specified in the content model contstraint.
      *
-     * @param metadataZipNodeRef the Alfresco Node Ref for the metadata ZIP file
-     * @return A sorted List of chapter metadata information
-     * @throws java.io.IOException if could not extract chapter metadata
+     * @return a list of available book genre names
      */
-    List<ChapterMetadataInfo> extractChapterMetadata(NodeRef metadataZipNodeRef) throws IOException;
-
-    /**
-     * Get the book genre name from the text file that contains the Book metadata.
-     * The text file with book metadata has a name as follows: <isbn>.txt.
-     * Such as for example "9780203075180.txt".
-     *
-     * @param metadataZipNodeRef the Alfresco Node Ref for the metadata ZIP file
-     * @return the book genre, such as Mystery
-     * @throws java.io.IOException if could not extract book metadata
-     */
-    public String getBookGenreName(NodeRef metadataZipNodeRef) throws IOException;
+    List<String> getAvailableGenreNames();
 
     /**
      * Recursively check the ISBN's children for last modified date that are after last published date.
@@ -87,7 +73,7 @@ public interface BestPubUtilsService {
      * @param nodeRef ISBN node reference
      * @return last modified date, or null if it has not been modified since last published
      */
-    public Date checkModifiedDates(final NodeRef nodeRef);
+    Date checkModifiedDates(NodeRef nodeRef);
 
     /**
      * Recursively check the ISBN's children for last modified date that are after last published date.
@@ -96,7 +82,7 @@ public interface BestPubUtilsService {
      * @param publishedDate
      * @return true if the metadata has been changed
      */
-    public Date checkModifiedDates(final NodeRef nodeRef, final Date publishedDate);
+    Date checkModifiedDates(NodeRef nodeRef, Date publishedDate);
 
     /**
      * Returns true if passed in text is an ISBN 13 number, false if not
@@ -104,7 +90,7 @@ public interface BestPubUtilsService {
      * @param isbn text that is to be checked if it is an ISBN 13 number, such as for example '9780203093474'
      * @return true if it is an ISBN 13 number, false if not
      */
-    public boolean isISBN(final String isbn);
+    boolean isISBN(String isbn);
 
     /**
      * Returns the ISBN number contained in passed in filename, if any
@@ -113,7 +99,7 @@ public interface BestPubUtilsService {
      *                 such as 9780203093474.zip or 9780203093474_Law_Chapter 1 - 40.zip
      * @return the ISBN number contained in the filename, such as 9780203093474, or null if not found
      */
-    public String getISBNfromFilename(final String filename);
+    String getISBNfromFilename(String filename);
 
     /**
      * If a content or metadata ZIP could not be processed correctly move it to a special directory for ZIPs
@@ -124,6 +110,6 @@ public interface BestPubUtilsService {
      *                               such as /alf_data/BestPub/Incoming/Metadata
      * @throws IOException if could not move the file
      */
-    public void moveZipToDirForFailedProcessing(File zipFile, String metadataFilesystemPath) throws IOException;
+    void moveZipToDirForFailedProcessing(File zipFile, String metadataFilesystemPath) throws IOException;
 
 }
