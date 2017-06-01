@@ -17,12 +17,11 @@ limitations under the License.
 package org.acme.bestpublishing.services;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.dictionary.constraint.ListOfValuesConstraint;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.repository.ContentData;
-import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ISO8601DateFormat;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -31,18 +30,14 @@ import org.acme.bestpublishing.model.BestPubContentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
+
+import static org.acme.bestpublishing.model.BestPubContentModel.*;
 
 /*
  * Implementation of the Best Publishing Generic Utility Service
@@ -123,6 +118,75 @@ public class BestPubUtilsServiceImpl implements BestPubUtilsService {
         return chapterFolderNodeRef;
     }
 
+    /**
+     * Create the chapter hierarchy for the book in the Book Management site.
+     * This would be under /Company Home/Sites/book-management/documentLibrary/2017/{ISBN}/....
+     *
+     * @param isbn the ISBN number for the book
+     * @param bookGenre the book genre name
+     * @param bookTitle the book title
+     * @param chapterCount the number of chapters
+     * @param chapterTitles the chapter titles
+     * @param processInfo information about the process instance that is making this call
+     * @return true if all went OK
+     */
+    /*
+    public boolean createChapterFolder(String isbn, Map<String, Properties> allMetadata, String processInfo) {
+        // Start by creating the top ISBN folder
+        NodeRef isbnFolderInfo = alfrescoRepoUtilsService.getChildByName(rhoFolderNodeRef, isbn);
+        if (isbnFolderInfo != null) {
+            LOG.warn("ISBN folder [{}] already exist, let's create folder hierarchy {}", isbn, processInfo);
+        } else {
+            isbnFolderInfo = serviceRegistry.getFileFolderService().create(
+                    rhoFolderNodeRef, isbn, BookFolderType.QNAME).getNodeRef();
+            LOG.debug("Created ISBN folder /Company Home/{}/{} [Subject={}]{}",
+                    new Object[]{RHO_FOLDER_NAME, isbn, bookGenre, processInfo});
+        }
+
+        // Setup the new /Company Home/RHO/<isbn> folder with Book Metadata Aspect
+        Map<QName, Serializable> bookMetadataAspectProps = new HashMap<>();
+        bookMetadataAspectProps.put(BookInfoAspect.Prop.ISBN, isbn);
+        bookMetadataAspectProps.put(BookInfoAspect.Prop.BOOK_TITLE, bookTitle);
+        bookMetadataAspectProps.put(BookInfoAspect.Prop.BOOK_GENRE_NAME, bookGenre);
+        bookMetadataAspectProps.put(BookInfoAspect.Prop.BOOK_NUMBER_OF_CHAPTERS, chapterCount);
+        bookMetadataAspectProps.put(BookInfoAspect.Prop.BOOK_METADATA_STATUS, BookMetadataStatus.MISSING.toString());
+        serviceRegistry.getNodeService().addAspect(isbnFolderInfo, BookInfoAspect.QNAME, bookMetadataAspectProps);
+
+        // Now create all the chapter sub-folders under the new ISBN folder
+        LOG.debug("The chapter titles for our book are as follows: {} {}", chapterTitles, processInfo);
+        if (chapterTitles == null) {
+            LOG.error("Missing chapter titles from T2 task, cannot setup chapter folders {}", processInfo);
+            return false;
+        }
+        int currentChapterNumber = 1;
+        for (String title : chapterTitles) {
+            String chapterFolderName = BestPubConstants.CHAPTER_FOLDER_NAME_PREFIX + currentChapterNumber;
+            if (alfrescoRepoUtilsService.getChildByName(isbnFolderInfo, chapterFolderName)==null) {
+                FileInfo chapterFileInfo = serviceRegistry.getFileFolderService().create(
+                        isbnFolderInfo, chapterFolderName, BestPubContentModel.ChapterFolderType.QNAME);
+                LOG.debug("Created chapter folder /Company Home/{}/{}/{} [chapterNo={}][chapterTitle={}][metaStatus={}]{}",
+                        new Object[]{RHO_FOLDER_NAME, isbn, chapterFileInfo.getName(), currentChapterNumber,
+                                title, BestPubContentModel.ChapterMetadataStatus.MISSING.toString(), processInfo});
+                Map<QName, Serializable> chapterMetadataAspectProps = new HashMap<QName, Serializable>();
+                chapterMetadataAspectProps.put(ChapterInfoAspect.Prop.CHAPTER_NUMBER, currentChapterNumber);
+                chapterMetadataAspectProps.put(ChapterInfoAspect.Prop.CHAPTER_TITLE, title);
+                chapterMetadataAspectProps.put(ChapterInfoAspect.Prop.CHAPTER_METADATA_STATUS,
+                        BestPubContentModel.ChapterMetadataStatus.MISSING.toString());
+                serviceRegistry.getNodeService().addAspect(
+                        chapterFileInfo.getNodeRef(), BookInfoAspect.QNAME, bookMetadataAspectProps);
+                serviceRegistry.getNodeService().addAspect(
+                        chapterFileInfo.getNodeRef(), ChapterInfoAspect.QNAME, chapterMetadataAspectProps);
+            } else {
+                LOG.debug("Already created [{}] in folder [{}], moving on... {}",
+                        new Object[] {title, isbnFolderInfo, processInfo});
+            }
+
+            currentChapterNumber++;
+        }
+
+        return true;
+    }
+*/
     @Override
     public List<String> getAvailableGenreNames() {
         return (List<String>)serviceRegistry.getDictionaryService().getConstraint(

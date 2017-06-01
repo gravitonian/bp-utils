@@ -226,7 +226,7 @@ public class AlfrescoWorkflowUtilsServiceImpl implements AlfrescoWorkflowUtilsSe
         WorkflowInstance workflowInstanceForIsbn = null;
         List<WorkflowInstance> wfInstances = getWorkflows(workflowDefinitionName);
         for (WorkflowInstance workflowInstance : wfInstances) {
-            String varIsbn = getStringProcessVariable(workflowInstance, BestPubWorkflowModel.VAR_RELATED_ISBN);
+            String varIsbn = getStringProcessVariable(workflowInstance, BestPubWorkflowModel.VAR_ISBN);
             if (StringUtils.equals(isbn, varIsbn)) {
                 workflowInstanceForIsbn = workflowInstance;
                 break;
