@@ -55,6 +55,8 @@ public class BestPubWorkflowModel {
 
     // Process variables not in any BestPub Model XML (i.e. no namespace required)
     public static final String VAR_ALL_METADATA = "allMetadata";
+    public static final String VAR_BOOK_INFO = "bookInfo";
+    public static final String VAR_CHAPTER_LIST = "chapterList";
     public static final String VAR_CONTENT_CHAPTER_MATCHING_OK = "contentChapterMatchingOk";
     public static final String VAR_CONTENT_FOUND = "contentFound";
     public static final String VAR_CONTENT_ERROR_FOUND = "contentErrorFound";

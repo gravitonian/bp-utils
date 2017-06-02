@@ -38,12 +38,15 @@ public interface BestPubConstants {
      */
      String COMPANY_HOME_NAME = "Company Home";
      String DATA_DICTIONARY_NAME = "Data Dictionary";
+     String SITES_NAME = "Sites";
+     String DOCUMENT_LIBRARY_NAME = "documentLibrary";
      String ADMIN_USER_NAME = "admin";
      String ALFRESCO_ADMINISTRATORS_GROUP_NAME = "GROUP_ALFRESCO_ADMINISTRATORS";
 
     /**
      * Best Publishing Specific Folder names
      */
+     String BOOK_MANAGEMENT_SITE_NAME = "book-management";
      String BESTPUB_FOLDER_NAME = "BestPub";
      String CHAPTERS_FOLDER_NAME = "Chapters";
      String ARTWORK_FOLDER_NAME = "Artwork";
@@ -60,7 +63,7 @@ public interface BestPubConstants {
      String PATH_TO_BESTPUB = "/app:company_home/cm:" + BESTPUB_FOLDER_NAME;
 
     /**
-     * Chapter folder naming, chapter1, chapter2 etc
+     * Chapter folder naming, chapter-1, chapter-2 etc
      */
      String CHAPTER_FOLDER_NAME_PREFIX = "chapter";
 

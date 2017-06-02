@@ -49,7 +49,7 @@ import java.util.*;
  * @version 1.0
  */
 public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
-    private static final Logger LOG = LoggerFactory.getLogger(AlfrescoRepoUtilsServiceImpl.class);
+    private static Logger LOG = LoggerFactory.getLogger(AlfrescoRepoUtilsServiceImpl.class);
 
     /**
      * Hash type to use when computing content hash that will be used to compare content files for equality
@@ -110,6 +110,15 @@ public class AlfrescoRepoUtilsServiceImpl implements AlfrescoRepoUtilsService {
         }
 
         return nodeRef;
+    }
+
+    @Override
+    public String getDisplayPathForNode(NodeRef nodeRef) {
+        Path folderPath = serviceRegistry.getNodeService().getPath(nodeRef);
+        String displayPath = folderPath.toDisplayPath(
+                serviceRegistry.getNodeService(), serviceRegistry.getPermissionService());
+
+        return displayPath;
     }
 
     @Override

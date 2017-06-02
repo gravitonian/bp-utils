@@ -41,7 +41,7 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import java.io.Serializable;
 import java.util.*;
 
-
+import static org.acme.bestpublishing.model.BestPubContentModel.*;
 /**
  * Activiti Workflow specific helper methods implementation.
  * <p>
@@ -271,13 +271,13 @@ public class AlfrescoWorkflowUtilsServiceImpl implements AlfrescoWorkflowUtilsSe
                 serviceRegistry.getWorkflowService().endTask(startTask.getId(), null);
             }
         } catch (RuntimeException e) {
-            LOG.error("Could not start workflow for ISBN " + properties.get(BestPubWorkflowModel.PROP_RELATED_ISBN) +
+            LOG.error("Could not start workflow for ISBN " + properties.get(BookInfoAspect.Prop.ISBN) +
                     " [workflowDefId=" + workflowDefId + "][packageFileSize=" + packageFileNodeRefs.size() + "]", e);
             return null;
         }
 
         LOG.debug("Started workflow for ISBN {} [workflowDefId={}][workflowInstanceId={}]packageFileSize={}]",
-                new Object[]{properties.get(BestPubWorkflowModel.PROP_RELATED_ISBN), workflowDefId,
+                new Object[]{properties.get(BookInfoAspect.Prop.ISBN), workflowDefId,
                         workflowPath.getInstance().getId(), packageFileNodeRefs.size()});
 
         return workflowPath.getInstance();

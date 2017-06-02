@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 /*
  * Generic Utility Service with methods that does not fit into
@@ -59,6 +60,27 @@ public interface BestPubUtilsService {
      * @return {@link NodeRef} of the destination chapter folder node reference, or null if it could not be found
      */
     NodeRef getChapterDestinationFolder(String fileName, NodeRef destIsbnFolderNodeRef);
+
+    /**
+     * Create the chapter hierarchy for the book in the Book Management site.
+     * This would be under /Company Home/Sites/book-management/documentLibrary/2017/{ISBN}/....
+     *
+     * @param isbn the ISBN number for the book
+     * @param bookInfo book metadata
+     * @param chapterList chapters metadata
+     * @param processInfo information about the process instance that is making this call
+     * @return true if all went OK
+     */
+    boolean createChapterFolder(String isbn, Properties bookInfo, List<Properties> chapterList,
+                                       String processInfo);
+
+    /**
+     * Get the base folder for where books are stored and managed.
+     * This will be the /Company Home/Sites/book-management/documentLibrary/{current year} folder.
+     *
+     * @return and Alfresco Node Reference pointing to the folder
+     */
+    NodeRef getBaseFolderForBooks();
 
     /**
      * Get the available book genre names, as specified in the content model contstraint.

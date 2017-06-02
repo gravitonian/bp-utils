@@ -54,6 +54,15 @@ public interface AlfrescoRepoUtilsService {
     NodeRef getNodeByDisplayPath(String path);
 
     /**
+     * Resolves the display path for a node reference. Can be a bit slow as uses
+     * NodeService to get the local name for each folder.
+     *
+     * @param nodeRef the Alfresco Node Reference that we want the display path for
+     * @return a display path, such as '/Company Home/Sites/book-management/documentLibrary/2017'
+     */
+    String getDisplayPathForNode(NodeRef nodeRef);
+
+    /**
      * Get a child node by name for passed in parent node.
      *
      * @param parent search for child nodes of this parent
