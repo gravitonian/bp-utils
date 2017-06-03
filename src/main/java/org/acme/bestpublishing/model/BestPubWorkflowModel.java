@@ -20,6 +20,7 @@ import org.alfresco.service.namespace.QName;
 
 /**
  * Best Publishing Workflow Model Java wrapper class.
+ * And definition of loads of process variables.
  *
  * @author martin.bergljung@marversolutions.org
  * @version 1.0
@@ -42,7 +43,11 @@ public class BestPubWorkflowModel {
 
     // Process variables that are part of the BestPub Workflow Model XML,
     // defined separately as they got underscore between namespace and local name.
+    // They are also used in User Task Forms
     public static final String VAR_PUBLISHING_DATE = NAMESPACE_PREFIX + "_publishingDate";
+    public static final String VAR_CONTENT_CHAPTER_MATCHING_ERROR_LIST =
+            NAMESPACE_PREFIX + "_contentChapterMatchingErrorList";
+    public static final String VAR_ISBN_FOLDER_NODEREF = NAMESPACE_PREFIX + "_isbnFolderNodeRef";
 
     // Process variables not in the BestPub Workflow Model XML but instead in
     // BestPub Content Model XML (i.e. bestpub: namespace required instead of bestpubw:)

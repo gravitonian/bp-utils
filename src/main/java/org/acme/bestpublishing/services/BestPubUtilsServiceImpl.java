@@ -106,22 +106,25 @@ public class BestPubUtilsServiceImpl implements BestPubUtilsService {
 
     @Override
     public NodeRef getChapterDestinationFolder(String fileName, NodeRef destIsbnFolderNodeRef) {
-        // Filename naming convention: [ISBN]-chapter[chapter number].[pdf|xml]
-        // Such as 9780203807217-chapter8.pdf
-        String chapterFolderName = fileName.substring(fileName.indexOf('-') + 1, fileName.lastIndexOf('.'));
-        if (StringUtils.isBlank(chapterFolderName)) {
-            LOG.error("Could not extract chapter folder name from filename [{}]", fileName);
+        // Filename naming convention: [ISBN]-Chapter-[chapter number].xhtml
+        // Such as 9780486282145-Chapter-001.xhtml
+        int indexOfDot = fileName.lastIndexOf('.');
+        int indexOfLastDash = indexOfDot - 4;
+        int chapterNr = Integer.parseInt(fileName.substring(indexOfLastDash + 1, indexOfDot));
+        if (chapterNr < 0 || chapterNr > 200) {
+            LOG.error("Incorrect chapter number from filename [{}]", fileName);
             return null;
         }
 
-        chapterFolderName = chapterFolderName.toLowerCase();
-        NodeRef chapterFolderNodeRef = alfrescoRepoUtilsService.getChildByName(destIsbnFolderNodeRef, chapterFolderName);
+        String chapterFolderName = CHAPTER_FOLDER_NAME_PREFIX + "-" + chapterNr;
+        NodeRef chapterFolderNodeRef = alfrescoRepoUtilsService.getChildByName(
+                destIsbnFolderNodeRef, chapterFolderName);
 
         return chapterFolderNodeRef;
     }
 
     @Override
-    public boolean createChapterFolder(String isbn, Properties bookInfo, List<Properties> chapterList,
+    public NodeRef createChapterFolders(String isbn, Properties bookInfo, List<Properties> chapterList,
                                        String processInfo) {
         // Start by creating the top ISBN folder
         NodeRef publishingYearNodeRef = getBaseFolderForBooks();
@@ -168,23 +171,29 @@ public class BestPubUtilsServiceImpl implements BestPubUtilsService {
                         chapterFileInfo.getNodeRef(), ChapterInfoAspect.QNAME, chapterMetadataAspectProps);
         }
 
-        return true;
+        return isbnFolderNodeRef;
     }
 
     @Override
     public NodeRef getBaseFolderForBooks() {
         Integer year = Calendar.getInstance().get(Calendar.YEAR);
         NodeRef docLibNodeRef = alfrescoRepoUtilsService.getNodeByDisplayPath(getBookManagementSiteDocLibPath());
+
         return alfrescoRepoUtilsService.getOrCreateFolder(docLibNodeRef, year.toString());
     }
 
-    /**
-     * Get the Display path to the Book Management Site Document Library.
-     *
-     * @return
-     */
-    private String getBookManagementSiteDocLibPath() {
+    @Override
+    public NodeRef getBaseFolderForIsbn(String isbn) {
+        NodeRef baseFolderForBooksNodeRef = getBaseFolderForBooks();
+        NodeRef isbnFolderNodeRef = alfrescoRepoUtilsService.getChildByName(baseFolderForBooksNodeRef, isbn);
+
+        return isbnFolderNodeRef;
+    }
+
+    @Override
+    public String getBookManagementSiteDocLibPath() {
         String siteDocLibPath = "/" + SITES_NAME + "/" + BOOK_MANAGEMENT_SITE_NAME + "/" + DOCUMENT_LIBRARY_NAME;
+
         return siteDocLibPath;
     }
 

@@ -52,11 +52,13 @@ public interface BestPubUtilsService {
 
     /**
      * Returns the {@link org.alfresco.service.cmr.repository.NodeRef} for a chapter folder in
-     * /Company Home/RHO/{ISBN} based on chapter number contained in passed in file name
+     * /Company Home/Sites/book-management/documentLibrary/{year}/{isbn}
+     * based on chapter number contained in passed in file name.
      *
-     * @param fileName              name of the file to extract chapter number from, for example 9780203807217-Chapter8.pdf
-     *                              (naming convention: [ISBN]-chapter[chapter number].[pdf|xml])
-     * @param destIsbnFolderNodeRef the node reference for the ISBN folder under /Company Home/RHO (the destination)
+     * @param fileName              name of the file to extract chapter number from, for example 9780486282145-Chapter-001.xhtml
+     *                              (naming convention: [ISBN]-Chapter-[chapter number].xhtml)
+     * @param destIsbnFolderNodeRef the node reference for the ISBN folder under
+     *                              /Company Home/Sites/book-management/documentLibrary/{year}
      * @return {@link NodeRef} of the destination chapter folder node reference, or null if it could not be found
      */
     NodeRef getChapterDestinationFolder(String fileName, NodeRef destIsbnFolderNodeRef);
@@ -69,10 +71,17 @@ public interface BestPubUtilsService {
      * @param bookInfo book metadata
      * @param chapterList chapters metadata
      * @param processInfo information about the process instance that is making this call
-     * @return true if all went OK
+     * @return the Alfresco Node Reference for the new ISBN folder
      */
-    boolean createChapterFolder(String isbn, Properties bookInfo, List<Properties> chapterList,
+    NodeRef createChapterFolders(String isbn, Properties bookInfo, List<Properties> chapterList,
                                        String processInfo);
+
+    /**
+     * Get the Display path to the Book Management Site Document Library.
+     *
+     * @return the display path to docLib for book management
+     */
+    public String getBookManagementSiteDocLibPath();
 
     /**
      * Get the base folder for where books are stored and managed.
@@ -81,6 +90,14 @@ public interface BestPubUtilsService {
      * @return and Alfresco Node Reference pointing to the folder
      */
     NodeRef getBaseFolderForBooks();
+
+    /**
+     * Get the base folder for where content is stored for the book with passed in ISBN.
+     * This will be the /Company Home/Sites/book-management/documentLibrary/{current year}/{isbn} folder.
+     *
+     * @return and Alfresco Node Reference pointing to the ISBN folder
+     */
+    NodeRef getBaseFolderForIsbn(String isbn);
 
     /**
      * Get the available book genre names, as specified in the content model contstraint.
