@@ -30,13 +30,14 @@ public class BestPubWorkflowModel {
     public static final String BESTPUB_PUBLISHING_WORKFLOW_NAME = "activiti$bestpub-publishing-process";
 
     // BestPub Workflow model namespace
-    public final static String NAMESPACE_URI = "http://www.acme.org/model/workflow/content/1.0";
+    public final static String NAMESPACE_URI = "http://www.acme.org/model/workflow/publishing/1.0";
     public final static String NAMESPACE_PREFIX = "bestpubw";
 
     /**
      * Workflow model properties QNames
      */
-    public static final QName PROP_PUBLISHING_DATE = QName.createQName(NAMESPACE_URI, "publishingDate");
+    public final static String publishingDatePropLocalName = "publishingDate";
+    public static final QName PROP_PUBLISHING_DATE = QName.createQName(NAMESPACE_URI, publishingDatePropLocalName);
 
     // Passing around content model properties as process variables requires
     // the use of _ between namespace and local prop name
@@ -44,7 +45,7 @@ public class BestPubWorkflowModel {
     // Process variables that are part of the BestPub Workflow Model XML,
     // defined separately as they got underscore between namespace and local name.
     // They are also used in User Task Forms
-    public static final String VAR_PUBLISHING_DATE = NAMESPACE_PREFIX + "_publishingDate";
+    public static final String VAR_PUBLISHING_DATE = NAMESPACE_PREFIX + "_" + publishingDatePropLocalName;
     public static final String VAR_CONTENT_CHAPTER_MATCHING_ERROR_LIST =
             NAMESPACE_PREFIX + "_contentChapterMatchingErrorList";
     public static final String VAR_ISBN_FOLDER_NODEREF = NAMESPACE_PREFIX + "_isbnFolderNodeRef";
