@@ -124,57 +124,6 @@ public class BestPubUtilsServiceImpl implements BestPubUtilsService {
     }
 
     @Override
-    public NodeRef createChapterFolders(String isbn, Properties bookInfo, List<Properties> chapterList,
-                                       String processInfo) {
-        // Start by creating the top ISBN folder
-        NodeRef publishingYearNodeRef = getBaseFolderForBooks();
-        NodeRef isbnFolderNodeRef = serviceRegistry.getFileFolderService().create(
-                publishingYearNodeRef, isbn, BookFolderType.QNAME).getNodeRef();
-            LOG.debug("Created ISBN folder {} {}",
-                    alfrescoRepoUtilsService.getDisplayPathForNode(isbnFolderNodeRef), processInfo);
-
-        // Set up the new /Company Home/Sites/book-management/documentLibrary/<year>/<isbn> folder with Book Info Aspect
-        Map<QName, Serializable> bookInfoAspectProps = new HashMap<>();
-        bookInfoAspectProps.put(BookInfoAspect.Prop.ISBN, isbn);
-        bookInfoAspectProps.put(BookInfoAspect.Prop.BOOK_TITLE,
-                bookInfo.getProperty(BOOK_METADATA_TITLE_PROP_NAME));
-        bookInfoAspectProps.put(BookInfoAspect.Prop.BOOK_GENRE_NAME,
-                bookInfo.getProperty(BOOK_METADATA_GENRE_PROP_NAME));
-        bookInfoAspectProps.put(BookInfoAspect.Prop.BOOK_NUMBER_OF_CHAPTERS,
-                bookInfo.getProperty(BOOK_METADATA_NR_OF_CHAPTERS_PROP_NAME));
-        bookInfoAspectProps.put(BookInfoAspect.Prop.BOOK_NUMBER_OF_PAGES,
-                bookInfo.getProperty(BOOK_METADATA_NR_OF_PAGES_PROP_NAME));
-        bookInfoAspectProps.put(BookInfoAspect.Prop.BOOK_METADATA_STATUS, BookMetadataStatus.MISSING.toString());
-        serviceRegistry.getNodeService().addAspect(isbnFolderNodeRef, BookInfoAspect.QNAME, bookInfoAspectProps);
-
-        // Now create all the chapter sub-folders under the new ISBN folder
-        for (Properties chapterInfo: chapterList) {
-            String chapterFolderName = CHAPTER_FOLDER_NAME_PREFIX + "-" +
-                    chapterInfo.get(CHAPTER_METADATA_NUMBER_PROP_NAME);
-                FileInfo chapterFileInfo = serviceRegistry.getFileFolderService().create(
-                        isbnFolderNodeRef, chapterFolderName, ChapterFolderType.QNAME);
-                LOG.debug("Created chapter folder {} [chapterTitle={}] {}",
-                        new Object[]{alfrescoRepoUtilsService.getDisplayPathForNode(chapterFileInfo.getNodeRef()),
-                                chapterInfo.get(CHAPTER_METADATA_TITLE_PROP_NAME), processInfo});
-                Map<QName, Serializable> chapterMetadataAspectProps = new HashMap<QName, Serializable>();
-                chapterMetadataAspectProps.put(ChapterInfoAspect.Prop.CHAPTER_NUMBER,
-                        chapterInfo.getProperty(CHAPTER_METADATA_NUMBER_PROP_NAME));
-                chapterMetadataAspectProps.put(ChapterInfoAspect.Prop.CHAPTER_TITLE,
-                        chapterInfo.getProperty(CHAPTER_METADATA_TITLE_PROP_NAME));
-                chapterMetadataAspectProps.put(ChapterInfoAspect.Prop.CHAPTER_AUTHOR_NAME,
-                        chapterInfo.getProperty(CHAPTER_METADATA_AUTHOR_PROP_NAME));
-                chapterMetadataAspectProps.put(ChapterInfoAspect.Prop.CHAPTER_METADATA_STATUS,
-                        BestPubContentModel.ChapterMetadataStatus.MISSING.toString());
-                serviceRegistry.getNodeService().addAspect(
-                        chapterFileInfo.getNodeRef(), BookInfoAspect.QNAME, bookInfoAspectProps);
-                serviceRegistry.getNodeService().addAspect(
-                        chapterFileInfo.getNodeRef(), ChapterInfoAspect.QNAME, chapterMetadataAspectProps);
-        }
-
-        return isbnFolderNodeRef;
-    }
-
-    @Override
     public NodeRef getBaseFolderForBooks() {
         Integer year = Calendar.getInstance().get(Calendar.YEAR);
         NodeRef docLibNodeRef = alfrescoRepoUtilsService.getNodeByDisplayPath(getBookManagementSiteDocLibPath());

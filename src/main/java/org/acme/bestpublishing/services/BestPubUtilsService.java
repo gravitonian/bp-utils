@@ -64,19 +64,6 @@ public interface BestPubUtilsService {
     NodeRef getChapterDestinationFolder(String fileName, NodeRef destIsbnFolderNodeRef);
 
     /**
-     * Create the chapter hierarchy for the book in the Book Management site.
-     * This would be under /Company Home/Sites/book-management/documentLibrary/2017/{ISBN}/....
-     *
-     * @param isbn the ISBN number for the book
-     * @param bookInfo book metadata
-     * @param chapterList chapters metadata
-     * @param processInfo information about the process instance that is making this call
-     * @return the Alfresco Node Reference for the new ISBN folder
-     */
-    NodeRef createChapterFolders(String isbn, Properties bookInfo, List<Properties> chapterList,
-                                       String processInfo);
-
-    /**
      * Get the Display path to the Book Management Site Document Library.
      *
      * @return the display path to docLib for book management
