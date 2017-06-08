@@ -45,4 +45,7 @@ public class BestPubMetadataFileModel {
     public static final String CHAPTER_METADATA_NUMBER_PROP_NAME = "chapterNumber";
     public static final String CHAPTER_METADATA_TITLE_PROP_NAME = "chapterTitle";
     public static final String CHAPTER_METADATA_AUTHOR_PROP_NAME = "chapterAuthor";
+
+    // Props used for existing chapter folder
+    public static final String CHAPTER_FOLDER_NAME_PROP_NAME = "chapterFolderName";
 }

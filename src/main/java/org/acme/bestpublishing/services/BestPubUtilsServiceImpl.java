@@ -16,17 +16,16 @@ limitations under the License.
 */
 package org.acme.bestpublishing.services;
 
-import org.acme.bestpublishing.model.BestPubContentModel;
 import org.acme.bestpublishing.model.BestPubMetadataFileModel;
+import org.acme.bestpublishing.props.ChapterFolderProperties;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.dictionary.constraint.ListOfValuesConstraint;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.model.FileInfo;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ISO8601DateFormat;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +38,6 @@ import java.util.regex.Matcher;
 
 import static org.acme.bestpublishing.constants.BestPubConstants.*;
 import static org.acme.bestpublishing.model.BestPubContentModel.*;
-import static org.acme.bestpublishing.model.BestPubMetadataFileModel.*;
 
 /*
  * Implementation of the Best Publishing Generic Utility Service
@@ -121,6 +119,38 @@ public class BestPubUtilsServiceImpl implements BestPubUtilsService {
                 destIsbnFolderNodeRef, chapterFolderName);
 
         return chapterFolderNodeRef;
+    }
+
+    @Override
+    public Map<ChapterFolderProperties, NodeRef> getSortedChapterFolders(NodeRef isbnFolderNodeRef) {
+        Set<QName> childNodeTypes = new HashSet<>();
+        childNodeTypes.add(ChapterFolderType.QNAME);
+        List<ChildAssociationRef> chapterFolderChildAssociations =
+                serviceRegistry.getNodeService().getChildAssocs(isbnFolderNodeRef, childNodeTypes);
+
+        Map<ChapterFolderProperties, NodeRef> existingChapterFolderProps2NodeRefMap = new TreeMap<>();
+
+        for (ChildAssociationRef chapterFolderChildAssoc : chapterFolderChildAssociations) {
+            NodeRef chapterFolderNodeRef = chapterFolderChildAssoc.getChildRef();
+            ChapterFolderProperties chapterFolderProps = new ChapterFolderProperties();
+
+            String chapterFolderName = (String) serviceRegistry.getNodeService().getProperty(
+                    chapterFolderNodeRef, ContentModel.PROP_NAME);
+            chapterFolderProps.put(BestPubMetadataFileModel.CHAPTER_FOLDER_NAME_PROP_NAME, chapterFolderName);
+            Serializable chapterNr = serviceRegistry.getNodeService().getProperty(
+                    chapterFolderNodeRef, ChapterInfoAspect.Prop.CHAPTER_NUMBER);
+            chapterFolderProps.put(BestPubMetadataFileModel.CHAPTER_METADATA_NUMBER_PROP_NAME, chapterNr);
+            String chapterTitle = (String) serviceRegistry.getNodeService().getProperty(
+                    chapterFolderNodeRef, ChapterInfoAspect.Prop.CHAPTER_TITLE);
+            chapterFolderProps.put(BestPubMetadataFileModel.CHAPTER_METADATA_TITLE_PROP_NAME, chapterTitle);
+            String chapterAuthor = (String) serviceRegistry.getNodeService().getProperty(
+                    chapterFolderNodeRef, ChapterInfoAspect.Prop.CHAPTER_AUTHOR_NAME);
+            chapterFolderProps.put(BestPubMetadataFileModel.CHAPTER_METADATA_AUTHOR_PROP_NAME, chapterAuthor);
+
+            existingChapterFolderProps2NodeRefMap.put(chapterFolderProps, chapterFolderNodeRef);
+        }
+
+        return existingChapterFolderProps2NodeRefMap;
     }
 
     @Override

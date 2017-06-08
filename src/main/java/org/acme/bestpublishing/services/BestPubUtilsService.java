@@ -16,12 +16,14 @@ limitations under the License.
 */
 package org.acme.bestpublishing.services;
 
+import org.acme.bestpublishing.props.ChapterFolderProperties;
 import org.alfresco.service.cmr.repository.NodeRef;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /*
@@ -62,6 +64,14 @@ public interface BestPubUtilsService {
      * @return {@link NodeRef} of the destination chapter folder node reference, or null if it could not be found
      */
     NodeRef getChapterDestinationFolder(String fileName, NodeRef destIsbnFolderNodeRef);
+
+    /**
+     * Get all the chapter folders for an ISBN sorted on chapter number.
+     *
+     * @param isbnFolderNodeRef the alfresco node reference for the ISBN folder
+     * @return a tree map with all the node references for the chapter folders sorted on chapter number
+     */
+    public Map<ChapterFolderProperties, NodeRef> getSortedChapterFolders(NodeRef isbnFolderNodeRef);
 
     /**
      * Get the Display path to the Book Management Site Document Library.
