@@ -29,10 +29,8 @@ public class ChapterFolderProperties extends Properties implements Comparable<Ch
 
     @Override
     public int compareTo(ChapterFolderProperties otherProps) {
-        Integer thisChapterNr =
-                Integer.parseInt(getProperty(BestPubMetadataFileModel.CHAPTER_METADATA_NUMBER_PROP_NAME));
-        Integer otherChapteNr =
-                Integer.parseInt(otherProps.getProperty(BestPubMetadataFileModel.CHAPTER_METADATA_NUMBER_PROP_NAME));
+        Integer thisChapterNr = (Integer) get(BestPubMetadataFileModel.CHAPTER_METADATA_NUMBER_PROP_NAME);
+        Integer otherChapteNr = (Integer) otherProps.get(BestPubMetadataFileModel.CHAPTER_METADATA_NUMBER_PROP_NAME);
 
         return Integer.compare(thisChapterNr, otherChapteNr);
     }

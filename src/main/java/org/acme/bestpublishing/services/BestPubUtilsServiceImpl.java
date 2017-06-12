@@ -103,6 +103,12 @@ public class BestPubUtilsServiceImpl implements BestPubUtilsService {
     }
 
     @Override
+    public String getChapterFolderName(int chapterNumber) {
+        String chapterFolderName = CHAPTER_FOLDER_NAME_PREFIX + "-" + chapterNumber;
+        return chapterFolderName;
+    }
+
+    @Override
     public NodeRef getChapterDestinationFolder(String fileName, NodeRef destIsbnFolderNodeRef) {
         // Filename naming convention: [ISBN]-Chapter-[chapter number].xhtml
         // Such as 9780486282145-Chapter-001.xhtml
@@ -114,9 +120,8 @@ public class BestPubUtilsServiceImpl implements BestPubUtilsService {
             return null;
         }
 
-        String chapterFolderName = CHAPTER_FOLDER_NAME_PREFIX + "-" + chapterNr;
         NodeRef chapterFolderNodeRef = alfrescoRepoUtilsService.getChildByName(
-                destIsbnFolderNodeRef, chapterFolderName);
+                destIsbnFolderNodeRef, getChapterFolderName(chapterNr));
 
         return chapterFolderNodeRef;
     }
@@ -137,7 +142,7 @@ public class BestPubUtilsServiceImpl implements BestPubUtilsService {
             String chapterFolderName = (String) serviceRegistry.getNodeService().getProperty(
                     chapterFolderNodeRef, ContentModel.PROP_NAME);
             chapterFolderProps.put(BestPubMetadataFileModel.CHAPTER_FOLDER_NAME_PROP_NAME, chapterFolderName);
-            Serializable chapterNr = serviceRegistry.getNodeService().getProperty(
+            Integer chapterNr = (Integer)serviceRegistry.getNodeService().getProperty(
                     chapterFolderNodeRef, ChapterInfoAspect.Prop.CHAPTER_NUMBER);
             chapterFolderProps.put(BestPubMetadataFileModel.CHAPTER_METADATA_NUMBER_PROP_NAME, chapterNr);
             String chapterTitle = (String) serviceRegistry.getNodeService().getProperty(

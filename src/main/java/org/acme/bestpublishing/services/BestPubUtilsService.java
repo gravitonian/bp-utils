@@ -53,6 +53,14 @@ public interface BestPubUtilsService {
     String formatDate(String pattern, Date date);
 
     /**
+     * Returns the chapter folder name for passed in chapter number.
+     *
+     * @param chapterNumber a chapter number, such as 9
+     * @return the chapter folder name, such as 'chapter-9'
+     */
+    String getChapterFolderName(int chapterNumber);
+
+    /**
      * Returns the {@link org.alfresco.service.cmr.repository.NodeRef} for a chapter folder in
      * /Company Home/Sites/book-management/documentLibrary/{year}/{isbn}
      * based on chapter number contained in passed in file name.
@@ -66,10 +74,11 @@ public interface BestPubUtilsService {
     NodeRef getChapterDestinationFolder(String fileName, NodeRef destIsbnFolderNodeRef);
 
     /**
-     * Get all the chapter folders for an ISBN sorted on chapter number.
+     * Get all the chapter folders for an ISBN sorted on chapter number (1, 2, 3, ...).
      *
      * @param isbnFolderNodeRef the alfresco node reference for the ISBN folder
-     * @return a tree map with all the node references for the chapter folders sorted on chapter number
+     * @return a tree map with all the node references for the chapter folders sorted on chapter number, starting with
+     * first chapter
      */
     public Map<ChapterFolderProperties, NodeRef> getSortedChapterFolders(NodeRef isbnFolderNodeRef);
 
