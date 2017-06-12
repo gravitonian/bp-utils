@@ -206,6 +206,7 @@ public class BestPubContentModel {
             public static final QName BOOK_NUMBER_OF_CHAPTERS = bestpub("nrOfChapters");
             public static final QName BOOK_NUMBER_OF_PAGES = bestpub("nrOfPages");
             public static final QName BOOK_METADATA_STATUS = bestpub("bookMetadataStatus");
+            public static final QName BOOK_PROCESSING_COMPLETE = bestpub("bookProcessingComplete");
         }
 
         public static final List<String> BOOK_GENRE_LIST = Arrays.asList(
