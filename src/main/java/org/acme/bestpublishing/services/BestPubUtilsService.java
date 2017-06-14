@@ -113,7 +113,7 @@ public interface BestPubUtilsService {
     List<String> getAvailableGenreNames();
 
     /**
-     * Recursively check the ISBN's children for last modified date that are after last published date.
+     * Recursively check the ISBN's children for last modified dates that are after last published date.
      *
      * @param nodeRef ISBN node reference
      * @return last modified date, or null if it has not been modified since last published

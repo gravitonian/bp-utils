@@ -67,5 +67,11 @@ public interface BestPubConstants {
      */
      String CHAPTER_FOLDER_NAME_PREFIX = "chapter";
 
-
+    /**
+     * EPub related stuff
+     */
+    String EPUB_OPEN_PUBLICATION_STRUCTURE_FOLDER_NAME = "OPS";
+    String EPUB_PACKAGE_FILE_FILENAME = "package.opf";
+    String EPUB_STYLESHEET_FOLDER_NAME = "css";
+    String EPUB_IMAGES_FOLDER_NAME = "images";
 }

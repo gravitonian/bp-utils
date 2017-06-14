@@ -196,7 +196,8 @@ public class BestPubUtilsServiceImpl implements BestPubUtilsService {
         String nodeRefXPath = serviceRegistry.getNodeService().getPath(nodeRef).
                 toPrefixString(serviceRegistry.getNamespaceService());
         String publishedDateString = ISO8601DateFormat.format(publishedDate);
-        String searchQuery = "PATH:\"" + nodeRefXPath + "//*\" AND @cm\\:modified:[" + publishedDateString + " TO NOW]";
+        String searchQuery =
+                "PATH:\"" + nodeRefXPath + "//*\" AND @cm\\:modified:[" + publishedDateString + " TO NOW]";
         Date latestModificationDate = null;
 
         List<NodeRef> modifiedNodeRefs = alfrescoRepoUtilsService.search(searchQuery);

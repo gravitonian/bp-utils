@@ -36,5 +36,13 @@
                   ref="org.acme.bestpublishing.services.alfrescoRepoUtilsService" />
         <property name="serviceRegistry" ref="ServiceRegistry"/>
     </bean>
-    
+
+    <bean id="org.acme.bestpublishing.services.publishingService"
+          class="org.acme.bestpublishing.services.PublishingServiceImpl">
+        <property name="alfrescoRepoUtilsService"
+                  ref="org.acme.bestpublishing.services.alfrescoRepoUtilsService" />
+        <property name="serviceRegistry" ref="ServiceRegistry"/>
+        <property name="epubPickupDirectory" value="${bestpub.publishing.epub.location}" />
+    </bean>
+
 </beans>
