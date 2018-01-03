@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>utils</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1</version>
 
     <name>BestPub Alfresco utils Platform Jar Module</name>
     <description>Alfresco Platform JAR Module with Repo utils and BestPub utils</description>
@@ -19,7 +19,7 @@
         <connection>scm:git:https://github.com/gravitonian/bp-utils.git</connection>
         <url>https://github.com/gravitonian/bp-utils</url>
         <developerConnection>scm:git:https://github.com/gravitonian/bp-utils.git</developerConnection>
-      <tag>HEAD</tag>
+      <tag>v1.1</tag>
   </scm>
 
     <properties>
