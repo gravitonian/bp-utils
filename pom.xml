@@ -6,17 +6,21 @@
     <artifactId>utils</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <!-- UPDTAED -->
     <name>BestPub Alfresco utils Platform Jar Module</name>
     <description>Alfresco Platform JAR Module with Repo utils and BestPub utils</description>
     <packaging>jar</packaging>
 
-    <!-- ADDED -->
     <parent>
         <groupId>org.acme.bestpublishing</groupId>
         <artifactId>best-publishing-parent</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.1</version>
     </parent>
+
+    <scm>
+        <connection>scm:git:https://github.com/gravitonian/utils.git</connection>
+        <url>https://github.com/gravitonian/utils</url>
+        <developerConnection>scm:git:https://github.com/gravitonian/utils.git</developerConnection>
+    </scm>
 
     <properties>
         <!-- Alfresco Maven Plugin version to use -->
