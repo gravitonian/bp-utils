@@ -185,7 +185,7 @@ public interface AlfrescoWorkflowUtilsService {
 
     /**
      * Get the passed in property as a list of Strings.
-     * <p/>
+     *
      * Either the property is already a list of strings,
      * or it's a string with values separated by passed in separator (for example "|")
      *
@@ -197,7 +197,7 @@ public interface AlfrescoWorkflowUtilsService {
 
     /**
      * Get a collection from a property.
-     * <p/>
+     *
      * Either the property is already a collection of strings,
      * or it's a comma separated string which will be converted into a collection.
      *

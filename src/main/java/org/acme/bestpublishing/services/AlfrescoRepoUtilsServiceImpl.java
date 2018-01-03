@@ -40,8 +40,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 /**
- * Implementation of the Alfresco repository helper, which manages and searches for stuff in local Alfresco repository
- * <p/>
+ * Implementation of the Alfresco repository helper, which manages and searches for stuff in local Alfresco repository.
+ *
  * Note. these are non-transactional call requiring an existing transaction to be in place.
  * Note2. proper permission checks also need to be in place before making calls.
  *

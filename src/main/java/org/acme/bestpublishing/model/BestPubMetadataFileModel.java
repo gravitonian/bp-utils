@@ -19,7 +19,7 @@ package org.acme.bestpublishing.model;
 /**
  * Best Publishing Metadata file format.
  * Naming conventions for metadata file properties.
- * <p/>
+ *
  * Book Metadata example:
  *  bookTitle=The Hound of the Baskervilles
  *  bookAuthors=Arthur Conan Doyle

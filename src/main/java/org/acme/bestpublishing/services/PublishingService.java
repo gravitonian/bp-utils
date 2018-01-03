@@ -21,7 +21,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 /**
  * Service used to create and store the EPub artifact that will be picked up by the fictive publishing system
  * and then delivered to the Website.
- * <p/>
+ *
  * Called from the Publishing DocLib action.
  *
  * @author martin.bergljung@marversolutions.org
